@@ -1,33 +1,43 @@
-# 🧸 Maisha - Kids 3D Gaming & Entertainment Arcade
+# 🧸 Maisha Kids Arcade
 
-বাচ্চাদের জন্য আল্ট্রা-স্মুথ (60 FPS), ইন্টারঅ্যাক্টিভ 3D মাসকট এবং শিক্ষণীয় গেম প্ল্যাটফর্ম।
+A playful, mobile-friendly kids arcade built with Next.js, TypeScript, Three.js and React Three Fiber. The current release contains two interactive 3D games and two arcade games.
 
-## 🚀 টেক স্ট্যাক
-- **Next.js 14+ (App Router, TypeScript)**
-- **Tailwind CSS (Claymorphic UI Utilities)**
-- **Three.js & @react-three/fiber (3D WebGL Mascot)**
-- **Web Audio API (Zero-latency sound synthesizer)**
-- **Zustand (State Management & Persistence)**
-- **Prisma ORM + SQLite / PostgreSQL**
+## Playable games
 
-## 📦 প্রজেক্ট ইনস্টলেশন ও রান করার নিয়ম
+- **3D Balloon Pop** — pop rising 3D balloons, earn points and stars, and beat the 45-second timer.
+- **3D Rainbow Xylophone** — tap 3D musical bars to play synthesized notes.
+- **Candy Slicer** — swipe with mouse or touch to slice fruit and candy.
+- **Monster Tap** — tap the popping monster before the 30-second timer ends.
 
-১. ডিপেন্ডেন্সি ইনস্টল করুন:
+Other game ideas are clearly marked **Coming Soon** until their gameplay is implemented.
+
+## Requirements
+
+- Node.js 18.17 or newer
+- npm
+
+## Install and run
+
 ```bash
 npm install
-```
-
-২. ডেটাবেস সেটআপ করুন:
-```bash
-npx prisma db push
-```
-
-৩. ডেভেলপমেন্ট সার্ভার রান করুন:
-```bash
 npm run dev
 ```
 
-ব্রাউজারে খুলুন: `http://localhost:3000`
+Open `http://localhost:3000`.
 
----
-Made with ❤️ for Maisha!
+## Production build
+
+```bash
+npm run lint
+npm run build
+npm start
+```
+
+No database is required. Coins, avatar selection, sound preference and best scores are stored locally in the browser with Zustand persistence. A lightweight service worker provides a cached app-shell fallback; a first visit still requires an internet connection to download the app and game bundles.
+
+## Notes
+
+- 3D canvases use a capped device pixel ratio and low-power WebGL preference for better performance on phones and tablets.
+- Game components are loaded on demand.
+- Sound is generated with the Web Audio API and can be muted from the header.
+- The Google Fonts stylesheet requests Hind Siliguri; system fallbacks are provided if it is unavailable.

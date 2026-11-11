@@ -1,0 +1,17 @@
+{
+  "name": "Maisha Kids Arcade",
+  "short_name": "Maisha Arcade",
+  "description": "মজার গেমের জগৎ",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f5ff",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
