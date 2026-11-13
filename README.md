@@ -1,43 +1,33 @@
-# 🧸 Maisha Kids Arcade
+# 🧸 Maisha - Kids 3D Gaming Arcade
 
-A playful, mobile-friendly kids arcade built with Next.js, TypeScript, Three.js and React Three Fiber. The current release contains two interactive 3D games and two arcade games.
+বাচ্চাদের জন্য ৩ডি মাসকট ও ১২টি মজার গেম (৬টি পুরো ৩ডি)।
 
-## Playable games
+## টেক স্ট্যাক
+- Next.js 14 (App Router, TypeScript), Tailwind CSS
+- Three.js + @react-three/fiber + drei (৩ডি মাসকট ও ৩ডি গেম)
+- Web Audio API (কোনো অডিও ফাইল ছাড়া সাউন্ড সিন্থেসাইজার)
+- Zustand (কয়েন, স্কোর, সাউন্ড, অবতার - localStorage-এ সেভ হয়)
 
-- **3D Balloon Pop** — pop rising 3D balloons, earn points and stars, and beat the 45-second timer.
-- **3D Rainbow Xylophone** — tap 3D musical bars to play synthesized notes.
-- **Candy Slicer** — swipe with mouse or touch to slice fruit and candy.
-- **Monster Tap** — tap the popping monster before the 30-second timer ends.
-
-Other game ideas are clearly marked **Coming Soon** until their gameplay is implemented.
-
-## Requirements
-
-- Node.js 18.17 or newer
-- npm
-
-## Install and run
-
+## চালানোর নিয়ম
 ```bash
 npm install
-npm run dev
+npm run dev      # http://localhost:3000
+npm run build && npm start
 ```
 
-Open `http://localhost:3000`.
+## গেম লিস্ট
+| গেম | ধরন |
+|---|---|
+| বেলুন পপ, মনস্টার ট্যাপ, জাইলোফোন, সুইটস ক্যাচার, মার্বেল রোলার, রকেট স্পেস রান | ৩ডি |
+| ক্যান্ডি স্লাইসার, মেমোরি ম্যাচ, সাইমন, গণিত বাবল, সান বনাম মুন, গ্লো আর্ট | ২ডি |
 
-## Production build
+## কাঠামো
+- `src/lib/games.ts` - সব গেমের তথ্য (নাম, সময়, তারার স্কোর)। নতুন গেম যোগ করতে এখানে এন্ট্রি দিন, তারপর `src/components/games/index.tsx`-এ কম্পোনেন্ট যোগ করুন।
+- `src/components/ui/GameShell.tsx` - সব গেমের সাধারণ পর্দা: শুরু, বিরতি, টাইমার, তারা ও কয়েন পুরস্কার। গেম থেকে `useGame()` দিয়ে `addScore` / `finish` ডাকতে হয়।
+- `src/components/3d/` - মাসকট ও ৩ডি গেমের শেয়ার্ড অংশ (`Scene3D`, পার্টিকল `Burst`)।
 
-```bash
-npm run lint
-npm run build
-npm start
-```
+## কয়েন নিয়ম
+কয়েন শুধু রাউন্ড শেষে তারা অনুযায়ী পাওয়া যায় (০ তারা = ২, ১ = ৫, ২ = ১০, ৩ = ২০)। মাসকটে ট্যাপ করলে প্রতি ৪৫ সেকেন্ডে একবার +৫ বোনাস। কয়েন দিয়ে নতুন অবতার কেনা যায়।
 
-No database is required. Coins, avatar selection, sound preference and best scores are stored locally in the browser with Zustand persistence. A lightweight service worker provides a cached app-shell fallback; a first visit still requires an internet connection to download the app and game bundles.
-
-## Notes
-
-- 3D canvases use a capped device pixel ratio and low-power WebGL preference for better performance on phones and tablets.
-- Game components are loaded on demand.
-- Sound is generated with the Web Audio API and can be muted from the header.
-- The Google Fonts stylesheet requests Hind Siliguri; system fallbacks are provided if it is unavailable.
+---
+Made with ❤️ for Maisha!
