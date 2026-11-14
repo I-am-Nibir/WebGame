@@ -52,7 +52,8 @@ function BurstItem({ burst, onDone }: { burst: BurstData; onDone: (id: number) =
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, burst.count]} frustumCulled={false}>
       <icosahedronGeometry args={[1, 0]} />
-      <meshBasicMaterial color={burst.color} />
+      {/* emissive so the confetti glows with the bloom effect */}
+      <meshStandardMaterial color={burst.color} emissive={burst.color} emissiveIntensity={1.15} roughness={0.35} />
     </instancedMesh>
   );
 }

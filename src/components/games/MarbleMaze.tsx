@@ -9,6 +9,8 @@ import * as THREE from "three";
 import Scene3D, { useFit } from "@/components/3d/Scene3D";
 import { useBursts } from "@/components/3d/Burst";
 import { makeStarGeometry } from "@/components/3d/shapes";
+import { Toy } from "@/components/3d/toy";
+import { woodTexture, checkerTexture, swirlTexture } from "@/components/3d/textures";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
 
@@ -92,9 +94,9 @@ function Walls({ walls }: { walls: Wall[] }) {
     ref.current.instanceMatrix.needsUpdate = true;
   }, [walls]);
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, walls.length]}>
+    <instancedMesh ref={ref} args={[undefined, undefined, walls.length]} castShadow receiveShadow>
       <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="#f9a8d4" roughness={0.5} />
+      <Toy color="#ec4899" roughness={0.28} glow={0.08} />
     </instancedMesh>
   );
 }
@@ -107,7 +109,10 @@ function Field() {
   const { spawn, node } = useBursts();
 
   const board = useRef<THREE.Group>(null!);
-  const marbleMesh = useRef<THREE.Mesh>(null!);
+  const marbleMesh = useRef<THREE.Group>(null!);
+  const wood = useMemo(() => woodTexture("#a8672c", [2, 2], 21), []);
+  const floor = useMemo(() => checkerTexture("#fde7b0", "#f7cf7e", 12, [1, 1]), []);
+  const swirl = useMemo(() => swirlTexture(), []);
   const starRefs = useRef<(THREE.Mesh | null)[]>([]);
   const got = useRef<boolean[]>([false, false, false]);
   const done = useRef(false);
@@ -273,31 +278,32 @@ function Field() {
   return (
     <group scale={fit}>
       <group ref={board}>
-        {/* base */}
-        <RoundedBox args={[N + 0.7, 0.4, N + 0.7]} radius={0.15} position={[0, -0.2, 0]}>
-          <meshStandardMaterial color="#6d28d9" roughness={0.6} />
+        {/* wooden tray */}
+        <RoundedBox args={[N + 0.7, 0.4, N + 0.7]} radius={0.15} smoothness={4} position={[0, -0.2, 0]} castShadow receiveShadow>
+          <meshStandardMaterial map={wood} roughness={0.5} />
         </RoundedBox>
-        {/* floor */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+        {/* checkered floor */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]} receiveShadow>
           <planeGeometry args={[N, N]} />
-          <meshStandardMaterial color="#fef3c7" roughness={0.9} />
+          <meshStandardMaterial map={floor} roughness={0.6} />
         </mesh>
         <Walls walls={walls} />
 
         {/* start pad */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[cx(0), 0.012, cz(0)]}>
-          <circleGeometry args={[0.38, 24]} />
-          <meshBasicMaterial color="#86efac" />
+          <circleGeometry args={[0.38, 32]} />
+          <meshStandardMaterial color="#86efac" emissive="#4ade80" emissiveIntensity={0.9} roughness={0.4} />
         </mesh>
-        {/* goal hole */}
+        {/* goal hole with a glowing gold ring */}
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[goal.x, 0.014, goal.z]}>
-          <circleGeometry args={[0.3, 24]} />
-          <meshBasicMaterial color="#1e1b4b" />
+          <circleGeometry args={[0.3, 32]} />
+          <meshBasicMaterial color="#0b0830" />
         </mesh>
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[goal.x, 0.02, goal.z]}>
-          <torusGeometry args={[0.34, 0.05, 8, 28]} />
-          <meshStandardMaterial color="#fbbf24" emissive="#f59e0b" emissiveIntensity={0.8} />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[goal.x, 0.03, goal.z]}>
+          <torusGeometry args={[0.34, 0.055, 14, 40]} />
+          <meshStandardMaterial color="#fbbf24" emissive="#f59e0b" emissiveIntensity={2.2} metalness={0.6} roughness={0.25} />
         </mesh>
+        <pointLight position={[goal.x, 0.8, goal.z]} color="#fbbf24" intensity={1.2} distance={2.5} />
 
         {stars.map((st, i) => (
           <mesh
@@ -308,14 +314,21 @@ function Field() {
             geometry={starGeo}
             position={[st.x, 0.4, st.z]}
           >
-            <meshStandardMaterial color="#fbbf24" emissive="#f59e0b" emissiveIntensity={0.5} />
+            <meshStandardMaterial color="#fcd34d" emissive="#f59e0b" emissiveIntensity={1.6} metalness={0.7} roughness={0.18} />
           </mesh>
         ))}
 
-        <mesh ref={marbleMesh} position={[cx(0), R + 0.02, cz(0)]}>
-          <sphereGeometry args={[R, 24, 24]} />
-          <meshStandardMaterial color="#38bdf8" roughness={0.1} metalness={0.4} />
-        </mesh>
+        {/* cat's-eye glass marble: swirl core + glossy glass shell */}
+        <group ref={marbleMesh} position={[cx(0), R + 0.02, cz(0)]}>
+          <mesh castShadow>
+            <sphereGeometry args={[R * 0.78, 32, 24]} />
+            <meshStandardMaterial map={swirl} roughness={0.35} emissiveMap={swirl} emissive="#ffffff" emissiveIntensity={0.35} />
+          </mesh>
+          <mesh>
+            <sphereGeometry args={[R, 48, 36]} />
+            <meshPhysicalMaterial color="#bae6fd" transparent opacity={0.42} roughness={0.03} metalness={0} clearcoat={1} clearcoatRoughness={0} envMapIntensity={2.4} ior={1.5} depthWrite={false} />
+          </mesh>
+        </group>
         {node}
       </group>
     </group>
@@ -326,7 +339,7 @@ export default function MarbleMaze() {
   const t = useT();
   return (
     <>
-      <Scene3D cameraPosition={[0, 9, 5.5]} lookAt={[0, 0, 0]}>
+      <Scene3D cameraPosition={[0, 9, 5.5]} lookAt={[0, 0, 0]} shadows mood="toy" bloom={0.5}>
         <Field />
       </Scene3D>
       <div className="absolute bottom-3 inset-x-0 text-center text-white/90 font-bold pointer-events-none text-sm">

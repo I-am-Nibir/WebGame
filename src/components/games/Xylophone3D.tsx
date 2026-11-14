@@ -8,6 +8,8 @@ import { Html, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
 import Scene3D, { useFit } from "@/components/3d/Scene3D";
 import { useBursts } from "@/components/3d/Burst";
+import { Toy, Metal } from "@/components/3d/toy";
+import { woodTexture } from "@/components/3d/textures";
 import { sounds } from "@/lib/audioEngine";
 
 const NOTES = [
@@ -45,7 +47,7 @@ function Bar({
   onPlay: (i: number) => void;
 }) {
   const grp = useRef<THREE.Group>(null!);
-  const mat = useRef<THREE.MeshStandardMaterial>(null!);
+  const mat = useRef<THREE.MeshPhysicalMaterial>(null!);
   const { pos, dims } = layout(i, portrait);
   const note = NOTES[i];
 
@@ -54,7 +56,7 @@ function Bar({
     pressed.current[i] = Math.max(0, p - Math.min(dt, 0.05) * 4);
     grp.current.position.z = pos[2] - p * 0.2;
     const pulse = hint ? 0.35 + 0.3 * Math.sin(state.clock.elapsedTime * 6) : 0;
-    mat.current.emissiveIntensity = Math.max(p * 0.9, pulse);
+    mat.current.emissiveIntensity = Math.max(0.12, p * 1.6, pulse * 1.6);
   });
 
   return (
@@ -62,7 +64,9 @@ function Bar({
       <RoundedBox
         args={dims}
         radius={0.12}
-        smoothness={4}
+        smoothness={5}
+        castShadow
+        receiveShadow
         onPointerDown={(e) => {
           e.stopPropagation();
           onPlay(i);
@@ -71,14 +75,20 @@ function Bar({
           if ((e.buttons ?? 0) > 0) onPlay(i);
         }}
       >
-        <meshStandardMaterial ref={mat} color={note.color} emissive={note.color} emissiveIntensity={0} roughness={0.3} metalness={0.15} />
+        <Toy ref={mat} color={note.color} roughness={0.18} clearcoat={1} clearcoatRoughness={0.04} glow={0.12} />
       </RoundedBox>
-      {/* little screws */}
+      {/* shiny metal screws */}
       {[-1, 1].map((s) => (
-        <mesh key={s} position={portrait ? [s * (dims[0] / 2 - 0.2), 0, 0.21] : [0, s * (dims[1] / 2 - 0.25), 0.21]}>
-          <sphereGeometry args={[0.07, 10, 10]} />
-          <meshStandardMaterial color="#ffffff" opacity={0.8} transparent />
-        </mesh>
+        <group key={s} position={portrait ? [s * (dims[0] / 2 - 0.2), 0, 0.21] : [0, s * (dims[1] / 2 - 0.25), 0.21]}>
+          <mesh rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.075, 0.075, 0.05, 20]} />
+            <Metal color="#e2e8f0" />
+          </mesh>
+          <mesh position={[0, 0, 0.03]}>
+            <boxGeometry args={[0.1, 0.014, 0.01]} />
+            <meshStandardMaterial color="#475569" />
+          </mesh>
+        </group>
       ))}
       <Html center pointerEvents="none" position={[0, 0, 0.25]}>
         <span style={{ color: "white", fontWeight: 900, fontSize: 24, textShadow: "0 2px 4px rgba(0,0,0,.35)" }}>{tt(note.label, note.en)}</span>
@@ -99,6 +109,7 @@ function Field({
   onCorrect: () => void;
 }) {
   const size = useThree((s) => s.size);
+  const wood = useMemo(() => woodTexture("#b8793a", [2, 1.4], 4), []);
   const portrait = size.width < size.height;
   // leave room at the bottom for the "learn the song" button
   const fit = useFit(portrait ? 3.5 : 9, portrait ? 8.6 : 5.6);
@@ -124,8 +135,8 @@ function Field({
   return (
     <>
       <group scale={fit}>
-        <RoundedBox args={[plate[0], plate[1], plate[2]]} radius={0.25} position={[0, 0, -0.35]}>
-          <meshStandardMaterial color="#b45309" roughness={0.8} />
+        <RoundedBox args={[plate[0], plate[1], plate[2]]} radius={0.25} smoothness={4} position={[0, 0, -0.35]} receiveShadow castShadow>
+          <meshStandardMaterial map={wood} roughness={0.5} />
         </RoundedBox>
         {NOTES.map((_, i) => (
           <Bar key={i} i={i} portrait={portrait} pressed={pressed} hint={hintIndex === i} onPlay={play} />
@@ -159,7 +170,7 @@ export default function Xylophone3D() {
 
   return (
     <div className="absolute inset-0" key={key}>
-      <Scene3D cameraPosition={[0, 0, 8]}>
+      <Scene3D cameraPosition={[0, 0, 8]} shadows mood="toy" bloom={0.55}>
         <Field pressed={pressed} hintIndex={hintIndex} playRef={playRef} onCorrect={onCorrect} />
       </Scene3D>
       <div className="absolute bottom-4 left-0 right-0 flex justify-center pointer-events-none">

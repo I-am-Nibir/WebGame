@@ -8,6 +8,8 @@ import * as THREE from "three";
 import Scene3D from "@/components/3d/Scene3D";
 import { useBursts } from "@/components/3d/Burst";
 import { makeStarGeometry } from "@/components/3d/shapes";
+import { Toy } from "@/components/3d/toy";
+import { wickerTexture, stripeTexture } from "@/components/3d/textures";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
 
@@ -26,53 +28,109 @@ interface Item {
   spin: number;
 }
 
+const SPRINKLES = ["#ef4444", "#fde047", "#22c55e", "#38bdf8", "#ffffff", "#a855f7"];
+const sprinkleSpots = Array.from({ length: 14 }, (_, i) => {
+  const a = i * 2.4;
+  const r = 0.16 + ((i * 37) % 10) / 70;
+  return { x: Math.cos(a) * r, z: Math.sin(a) * r, rot: a, c: SPRINKLES[i % SPRINKLES.length] };
+});
+
 function Sweet({ kind }: { kind: Kind }) {
   const starGeo = useMemo(() => (kind === "star" ? makeStarGeometry(0.4, 0.18, 0.14) : null), [kind]);
+  const stripe = useMemo(() => (kind === "candy" ? stripeTexture("#ef4444", "#ffffff", 6) : null), [kind]);
   if (kind === "cupcake") {
     return (
       <group>
-        <mesh position={[0, -0.15, 0]}>
-          <cylinderGeometry args={[0.38, 0.26, 0.38, 16]} />
-          <meshStandardMaterial color="#d97706" roughness={0.6} />
+        {/* paper wrapper */}
+        <mesh position={[0, -0.15, 0]} castShadow>
+          <cylinderGeometry args={[0.38, 0.26, 0.38, 24, 1]} />
+          <meshPhysicalMaterial color="#f59e0b" roughness={0.45} sheen={1} sheenColor="#fde68a" clearcoat={0.4} />
         </mesh>
-        <mesh position={[0, 0.15, 0]} scale={[1, 0.8, 1]}>
-          <sphereGeometry args={[0.4, 18, 18]} />
-          <meshStandardMaterial color="#f9a8d4" roughness={0.4} />
+        {Array.from({ length: 12 }, (_, i) => (
+          <mesh key={i} position={[Math.cos((i / 12) * Math.PI * 2) * 0.32, -0.15, Math.sin((i / 12) * Math.PI * 2) * 0.32]} rotation={[0, -(i / 12) * Math.PI * 2, 0.17]}>
+            <boxGeometry args={[0.012, 0.36, 0.05]} />
+            <meshStandardMaterial color="#b45309" roughness={0.6} />
+          </mesh>
+        ))}
+        {/* swirled frosting */}
+        {[
+          [0.12, 0.38, 0.17],
+          [0.3, 0.32, 0.14],
+          [0.46, 0.22, 0.12],
+        ].map(([y, r, t], i) => (
+          <mesh key={i} position={[0, y, 0]} rotation={[Math.PI / 2, 0, i * 0.8]} castShadow>
+            <torusGeometry args={[r, t, 18, 32]} />
+            <Toy color="#f9a8d4" roughness={0.3} glow={0.2} />
+          </mesh>
+        ))}
+        {sprinkleSpots.slice(0, 8).map((p, i) => (
+          <mesh key={i} position={[p.x * 1.1, 0.5 - (p.x * p.x + p.z * p.z) * 1.2, p.z * 1.1]} rotation={[0.6, p.rot, 0.4]}>
+            <capsuleGeometry args={[0.012, 0.045, 4, 6]} />
+            <meshStandardMaterial color={p.c} roughness={0.4} emissive={p.c} emissiveIntensity={0.2} />
+          </mesh>
+        ))}
+        {/* cherry */}
+        <mesh position={[0, 0.58, 0]} castShadow>
+          <sphereGeometry args={[0.1, 20, 16]} />
+          <Toy color="#dc2626" roughness={0.12} glow={0.3} />
         </mesh>
-        <mesh position={[0, 0.5, 0]}>
-          <sphereGeometry args={[0.1, 12, 12]} />
-          <meshStandardMaterial color="#dc2626" roughness={0.3} />
+        <mesh position={[0.02, 0.7, 0]} rotation={[0, 0, -0.5]}>
+          <cylinderGeometry args={[0.008, 0.008, 0.14, 5]} />
+          <meshStandardMaterial color="#166534" />
         </mesh>
       </group>
     );
   }
   if (kind === "donut") {
     return (
-      <mesh rotation={[0.55, 0, 0]}>
-        <torusGeometry args={[0.32, 0.17, 14, 24]} />
-        <meshStandardMaterial color="#f472b6" roughness={0.35} />
-      </mesh>
+      <group rotation={[0.55, 0, 0]}>
+        {/* dough */}
+        <mesh castShadow>
+          <torusGeometry args={[0.32, 0.17, 24, 40]} />
+          <meshPhysicalMaterial color="#e2a35b" roughness={0.65} sheen={0.5} sheenColor="#fde68a" />
+        </mesh>
+        {/* glossy icing */}
+        <mesh position={[0, 0, 0.055]} scale={[1, 1, 0.62]}>
+          <torusGeometry args={[0.32, 0.178, 24, 40]} />
+          <Toy color="#f472b6" roughness={0.18} glow={0.22} />
+        </mesh>
+        {sprinkleSpots.map((p, i) => {
+          const a = i * 0.45;
+          return (
+            <mesh key={i} position={[Math.cos(a) * (0.32 + Math.sin(i * 5) * 0.09), Math.sin(a) * (0.32 + Math.sin(i * 5) * 0.09), 0.17]} rotation={[0, 0, a + i]}>
+              <capsuleGeometry args={[0.012, 0.05, 4, 6]} />
+              <meshStandardMaterial color={p.c} roughness={0.4} emissive={p.c} emissiveIntensity={0.25} />
+            </mesh>
+          );
+        })}
+      </group>
     );
   }
   if (kind === "candy") {
     return (
       <group>
-        <mesh>
-          <sphereGeometry args={[0.28, 16, 16]} />
-          <meshStandardMaterial color="#38bdf8" roughness={0.3} />
+        <mesh castShadow>
+          <sphereGeometry args={[0.28, 32, 24]} />
+          <Toy color="#ffffff" map={stripe ?? undefined} roughness={0.12} glow={0.1} />
         </mesh>
-        {[-1, 1].map((s) => (
-          <mesh key={s} position={[s * 0.4, 0, 0]} rotation={[0, 0, (-s * Math.PI) / 2]}>
-            <coneGeometry args={[0.2, 0.28, 10]} />
-            <meshStandardMaterial color="#fbbf24" roughness={0.4} />
-          </mesh>
+        {[-1, 1].map((sd) => (
+          <group key={sd}>
+            <mesh position={[sd * 0.38, 0, 0]} rotation={[0, 0, (-sd * Math.PI) / 2]} castShadow>
+              <coneGeometry args={[0.19, 0.3, 14]} />
+              <Toy color="#38bdf8" roughness={0.15} transparent opacity={0.92} glow={0.2} />
+            </mesh>
+            <mesh position={[sd * 0.56, 0, 0]} rotation={[0, 0, (-sd * Math.PI) / 2]}>
+              <coneGeometry args={[0.16, 0.14, 14, 1, true]} />
+              <Toy color="#7dd3fc" roughness={0.2} transparent opacity={0.8} side={THREE.DoubleSide} glow={0.2} />
+            </mesh>
+          </group>
         ))}
       </group>
     );
   }
   return (
-    <mesh geometry={starGeo ?? undefined}>
-      <meshStandardMaterial color="#fbbf24" emissive="#f59e0b" emissiveIntensity={0.5} roughness={0.3} />
+    <mesh geometry={starGeo ?? undefined} castShadow>
+      <meshStandardMaterial color="#fcd34d" emissive="#f59e0b" emissiveIntensity={1.8} metalness={0.6} roughness={0.2} />
     </mesh>
   );
 }
@@ -122,6 +180,7 @@ function Basket({ x, y }: { x: React.MutableRefObject<number>; y: number }) {
   const { active } = useGame();
   const viewport = useThree((s) => s.viewport);
   const keys = useRef({ left: false, right: false });
+  const wicker = useMemo(() => wickerTexture([5, 1.2]), []);
   const lastMove = useRef(0);
 
   useEffect(() => {
@@ -160,25 +219,35 @@ function Basket({ x, y }: { x: React.MutableRefObject<number>; y: number }) {
 
   return (
     <group ref={ref} position={[0, y, 0]}>
-      <mesh position={[0, -0.25, 0]}>
-        <cylinderGeometry args={[0.95, 0.65, 0.8, 24, 1, true]} />
-        <meshStandardMaterial color="#c2813a" roughness={0.8} side={THREE.DoubleSide} />
+      {/* woven wicker body */}
+      <mesh position={[0, -0.25, 0]} castShadow>
+        <cylinderGeometry args={[0.95, 0.65, 0.8, 40, 1, true]} />
+        <meshStandardMaterial map={wicker} roughness={0.8} side={THREE.DoubleSide} />
       </mesh>
-      <mesh position={[0, -0.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[0.65, 24]} />
-        <meshStandardMaterial color="#a16207" roughness={0.8} />
+      <mesh position={[0, -0.64, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.65, 32]} />
+        <meshStandardMaterial map={wicker} roughness={0.85} />
       </mesh>
+      {/* rim */}
       <mesh position={[0, 0.15, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <torusGeometry args={[0.95, 0.07, 10, 28]} />
-        <meshStandardMaterial color="#7c4a14" roughness={0.7} />
+        <torusGeometry args={[0.95, 0.075, 16, 48]} />
+        <meshStandardMaterial color="#8a5316" roughness={0.55} />
       </mesh>
-      {/* weave stripes */}
-      {[-0.35, -0.05].map((yy) => (
-        <mesh key={yy} position={[0, yy, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[0.85 - (0.15 - yy) * 0.2, 0.025, 6, 28]} />
-          <meshStandardMaterial color="#7c4a14" />
+      {/* red gingham ribbon + bow */}
+      <mesh position={[0, -0.05, 0]}>
+        <cylinderGeometry args={[0.885, 0.84, 0.17, 40, 1, true]} />
+        <Toy color="#ef4444" roughness={0.45} side={THREE.DoubleSide} glow={0.1} />
+      </mesh>
+      {[-1, 1].map((sd) => (
+        <mesh key={sd} position={[sd * 0.1, -0.05, 0.9]} rotation={[0, 0, sd * 0.5]} scale={[1, 0.7, 0.5]}>
+          <sphereGeometry args={[0.13, 16, 12]} />
+          <Toy color="#ef4444" glow={0.2} />
         </mesh>
       ))}
+      <mesh position={[0, -0.05, 0.93]}>
+        <sphereGeometry args={[0.06, 12, 10]} />
+        <Toy color="#dc2626" glow={0.2} />
+      </mesh>
     </group>
   );
 }
@@ -247,7 +316,7 @@ export default function SweetsCatcher() {
   const t = useT();
   return (
     <>
-      <Scene3D cameraPosition={[0, 0, 10]}>
+      <Scene3D cameraPosition={[0, 0, 10]} mood="toy" bloom={0.5}>
         <Field />
       </Scene3D>
       <div className="absolute bottom-2 inset-x-0 text-center text-white/80 font-bold pointer-events-none text-sm">

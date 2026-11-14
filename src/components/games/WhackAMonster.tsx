@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
 import Scene3D, { useFit } from "@/components/3d/Scene3D";
 import { useBursts } from "@/components/3d/Burst";
+import { Toy } from "@/components/3d/toy";
+import { grassTexture, woodTexture } from "@/components/3d/textures";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
 
@@ -25,8 +27,8 @@ const FACE_URL = "photos/abir-face.webp";
 
 /** A fuzzy monster whose face is Abir kaku. Colour of the body changes per spawn. */
 function Monster({ i, slots, tex }: { i: number; slots: React.MutableRefObject<Slot[]>; tex: THREE.Texture }) {
-  const bodyMat = useRef<THREE.MeshStandardMaterial>(null!);
-  const faceMat = useRef<THREE.MeshBasicMaterial>(null!);
+  const bodyMat = useRef<THREE.MeshPhysicalMaterial>(null!);
+  const faceMat = useRef<THREE.MeshStandardMaterial>(null!);
   const stars = useRef<THREE.Group>(null!);
   const wob = useRef<THREE.Group>(null!);
   const lastType = useRef(-1);
@@ -46,26 +48,31 @@ function Monster({ i, slots, tex }: { i: number; slots: React.MutableRefObject<S
 
   return (
     <group ref={wob}>
-      {/* body */}
-      <mesh position={[0, 0.5, 0]} scale={[1, 1.05, 1]}>
-        <sphereGeometry args={[0.64, 28, 22]} />
-        <meshStandardMaterial ref={bodyMat} color={MONSTER_COLORS[0]} roughness={0.5} />
+      {/* fuzzy body: velvet sheen + soft clearcoat */}
+      <mesh position={[0, 0.5, 0]} scale={[1, 1.05, 1]} castShadow>
+        <sphereGeometry args={[0.64, 40, 32]} />
+        <Toy ref={bodyMat} color={MONSTER_COLORS[0]} roughness={0.45} clearcoat={0.4} clearcoatRoughness={0.35} sheen={0.7} sheenRoughness={0.6} glow={0.12} />
       </mesh>
-      {/* Abir's face, wrapped onto the front of the head */}
+      {/* belly highlight */}
+      <mesh position={[0, 0.3, 0.3]} scale={[1, 0.9, 0.7]}>
+        <sphereGeometry args={[0.42, 24, 20]} />
+        <meshStandardMaterial color="#ffffff" transparent opacity={0.06} roughness={1} depthWrite={false} />
+      </mesh>
+      {/* Abir's face, wrapped onto the front of the head (lit, so it sits in the scene) */}
       <mesh position={[0, 0.55, 0]} scale={[1, 1.05, 1]} renderOrder={2}>
-        <sphereGeometry args={[0.66, 40, 32, Math.PI / 2 - 0.95, 1.9, Math.PI / 2 - 1.2, 1.9]} />
-        <meshBasicMaterial ref={faceMat} map={tex} transparent alphaTest={0.02} toneMapped={false} />
+        <sphereGeometry args={[0.66, 48, 40, Math.PI / 2 - 0.95, 1.9, Math.PI / 2 - 1.2, 1.9]} />
+        <meshStandardMaterial ref={faceMat} map={tex} emissiveMap={tex} emissive="#ffffff" emissiveIntensity={0.55} roughness={0.55} transparent alphaTest={0.02} />
       </mesh>
-      {/* horns + ears */}
+      {/* glossy horns + ears */}
       {[-1, 1].map((sd) => (
         <group key={sd}>
-          <mesh position={[sd * 0.38, 1.15, 0]} rotation={[0, 0, -sd * 0.45]}>
-            <coneGeometry args={[0.12, 0.34, 10]} />
-            <meshStandardMaterial color="#fde68a" roughness={0.4} />
+          <mesh position={[sd * 0.38, 1.15, 0]} rotation={[0, 0, -sd * 0.45]} castShadow>
+            <coneGeometry args={[0.12, 0.34, 20]} />
+            <Toy color="#fde68a" roughness={0.2} glow={0.15} />
           </mesh>
-          <mesh position={[sd * 0.6, 0.4, 0.05]}>
-            <sphereGeometry args={[0.14, 12, 12]} />
-            <meshStandardMaterial color="#fde68a" roughness={0.5} />
+          <mesh position={[sd * 0.6, 0.4, 0.05]} castShadow>
+            <sphereGeometry args={[0.14, 20, 16]} />
+            <Toy color="#fde68a" roughness={0.3} glow={0.15} />
           </mesh>
         </group>
       ))}
@@ -74,7 +81,7 @@ function Monster({ i, slots, tex }: { i: number; slots: React.MutableRefObject<S
         {[0, 1, 2].map((k) => (
           <mesh key={k} position={[Math.cos((k * Math.PI * 2) / 3) * 0.5, 0.05 * k, Math.sin((k * Math.PI * 2) / 3) * 0.5]}>
             <octahedronGeometry args={[0.1]} />
-            <meshBasicMaterial color="#fde047" />
+            <meshStandardMaterial color="#fde047" emissive="#fde047" emissiveIntensity={2.4} />
           </mesh>
         ))}
       </group>
@@ -111,12 +118,13 @@ function Hole({
   return (
     <group position={[hole.x, 0, hole.z]}>
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
-        <circleGeometry args={[0.85, 32]} />
-        <meshBasicMaterial color="#3b1d0e" />
+        <circleGeometry args={[0.85, 40]} />
+        <meshStandardMaterial color="#1c0b04" roughness={1} />
       </mesh>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]} scale={[1, 1, 0.45]}>
-        <torusGeometry args={[0.88, 0.14, 12, 32]} />
-        <meshStandardMaterial color="#8b5a2b" roughness={0.8} />
+      {/* soft dirt mound around the hole */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.05, 0]} scale={[1, 1, 0.5]} castShadow receiveShadow>
+        <torusGeometry args={[0.9, 0.17, 18, 40]} />
+        <meshStandardMaterial color="#9a6a3a" roughness={0.95} />
       </mesh>
       <group ref={mon} position={[0, -1.6, 0]}>
         <Monster i={i} slots={slots} tex={tex} />
@@ -141,6 +149,19 @@ function Field() {
   const slots = useRef<Slot[]>(Array.from({ length: 9 }, () => ({ life: 0, hit: 0, type: 0 })));
   const timers = useRef({ spawn: 0.6, elapsed: 0 });
   const { spawn, node } = useBursts();
+  const grass = useMemo(() => grassTexture([3, 3]), []);
+  const wood = useMemo(() => woodTexture("#b8793a", [6, 1]), []);
+  const decor = useMemo(
+    () => {
+      const cols = ["#fb7185", "#fbbf24", "#f0abfc", "#ffffff", "#60a5fa"];
+      return Array.from({ length: 22 }, (_, i) => {
+        const a = (i / 22) * Math.PI * 2 + (i % 3) * 0.1;
+        const r = 3.7 + ((i * 37) % 10) / 10;
+        return { x: Math.cos(a) * r, z: Math.sin(a) * r * 0.9, s: 0.8 + ((i * 53) % 10) / 14, c: cols[i % cols.length] };
+      });
+    },
+    []
+  );
   const tex = useTexture(FACE_URL, (t) => {
     (t as THREE.Texture).colorSpace = THREE.SRGBColorSpace;
   }) as THREE.Texture;
@@ -189,11 +210,38 @@ function Field() {
 
   return (
     <group scale={fit}>
-      {/* grass */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
-        <circleGeometry args={[5.2, 48]} />
-        <meshStandardMaterial color="#4ade80" roughness={0.9} />
+      {/* striped lawn */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[5.2, 64]} />
+        <meshStandardMaterial map={grass} roughness={0.95} />
       </mesh>
+      {/* wooden rim */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.04, 0]} receiveShadow>
+        <ringGeometry args={[5.15, 5.65, 64]} />
+        <meshStandardMaterial map={wood} roughness={0.6} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.08, 0]}>
+        <circleGeometry args={[5.7, 64]} />
+        <meshStandardMaterial color="#7c4a14" roughness={0.8} />
+      </mesh>
+      {decor.map((d, i) => (
+        <group key={i} position={[d.x, 0, d.z]} scale={d.s}>
+          <mesh position={[0, 0.18, 0]} castShadow>
+            <cylinderGeometry args={[0.025, 0.03, 0.36, 6]} />
+            <meshStandardMaterial color="#16a34a" roughness={0.8} />
+          </mesh>
+          {[0, 1, 2, 3, 4].map((k) => (
+            <mesh key={k} position={[Math.cos((k * Math.PI * 2) / 5) * 0.11, 0.4, Math.sin((k * Math.PI * 2) / 5) * 0.11]} castShadow>
+              <sphereGeometry args={[0.085, 12, 10]} />
+              <Toy color={d.c} roughness={0.4} glow={0.2} />
+            </mesh>
+          ))}
+          <mesh position={[0, 0.4, 0]}>
+            <sphereGeometry args={[0.07, 12, 10]} />
+            <Toy color="#fde047" glow={0.4} />
+          </mesh>
+        </group>
+      ))}
       {HOLES.map((_, i) => (
         <Hole key={i} i={i} slots={slots} onHit={onHit} tex={tex} />
       ))}
@@ -204,7 +252,7 @@ function Field() {
 
 export default function WhackAMonster() {
   return (
-    <Scene3D cameraPosition={[0, 6.2, 6.8]} lookAt={[0, 0, 0]}>
+    <Scene3D cameraPosition={[0, 6.2, 6.8]} lookAt={[0, 0, 0]} shadows mood="day" bloom={0.4}>
       <Field />
     </Scene3D>
   );

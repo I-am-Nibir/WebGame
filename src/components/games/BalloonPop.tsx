@@ -6,6 +6,8 @@ import * as THREE from "three";
 import Scene3D from "@/components/3d/Scene3D";
 import { useBursts } from "@/components/3d/Burst";
 import { makeStarGeometry } from "@/components/3d/shapes";
+import { Toy } from "@/components/3d/toy";
+import { Sparkles } from "@react-three/drei";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
 
@@ -23,6 +25,36 @@ interface B {
   phase: number;
 }
 
+/** Pear-shaped balloon body: a lathe profile, a bit wider at the top, pinched towards the knot. */
+let balloonGeo: THREE.LatheGeometry | null = null;
+function getBalloonGeo() {
+  if (balloonGeo) return balloonGeo;
+  const pts: THREE.Vector2[] = [];
+  const N = 36;
+  for (let i = 0; i <= N; i++) {
+    const t = (i / N) * Math.PI; // 0 = bottom, PI = top
+    const x = 0.56 * Math.sin(t) * (1 - 0.15 * Math.cos(t));
+    const y = -Math.cos(t) * 0.7;
+    pts.push(new THREE.Vector2(Math.max(0.001, x), y));
+  }
+  // tiny dimple where the knot attaches
+  pts[0].set(0.001, -0.62);
+  pts[1].x = Math.max(pts[1].x, 0.04);
+  balloonGeo = new THREE.LatheGeometry(pts, 40);
+  balloonGeo.computeVertexNormals();
+  return balloonGeo;
+}
+
+let stringGeo: THREE.TubeGeometry | null = null;
+function getStringGeo() {
+  if (stringGeo) return stringGeo;
+  const curve = new THREE.CatmullRomCurve3(
+    Array.from({ length: 9 }, (_, i) => new THREE.Vector3(Math.sin(i * 1.3) * 0.09 * (i / 8), -0.78 - i * 0.2, 0))
+  );
+  stringGeo = new THREE.TubeGeometry(curve, 28, 0.014, 5, false);
+  return stringGeo;
+}
+
 function Balloon({
   b,
   onPop,
@@ -36,7 +68,7 @@ function Balloon({
   const gone = useRef(false);
   const { active } = useGame();
   const viewport = useThree((s) => s.viewport);
-  const starGeo = useMemo(() => (b.star ? makeStarGeometry(0.32, 0.14, 0.1) : null), [b.star]);
+  const starGeo = useMemo(() => (b.star ? makeStarGeometry(0.3, 0.13, 0.09) : null), [b.star]);
   const color = b.star ? "#fbbf24" : b.color;
 
   useFrame((state, dt) => {
@@ -46,6 +78,7 @@ function Balloon({
     const t = state.clock.elapsedTime + b.phase;
     g.position.x = b.x + Math.sin(t * 1.6) * 0.18;
     g.rotation.z = Math.sin(t * 1.6) * 0.1;
+    g.rotation.y = Math.sin(t * 0.9) * 0.5; // slow turn so the reflections slide across the surface
     if (g.position.y > viewport.height / 2 + 2 && !gone.current) {
       gone.current = true;
       onGone(b.id);
@@ -68,25 +101,35 @@ function Balloon({
         <sphereGeometry args={[1.0, 8, 8]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
-      <mesh scale={[1, 1.2, 1]}>
-        <sphereGeometry args={[0.55, 24, 24]} />
-        <meshStandardMaterial color={color} roughness={0.25} metalness={0.1} />
+      {/* glossy latex body */}
+      <mesh geometry={getBalloonGeo()}>
+        <Toy color={color} roughness={0.16} clearcoat={1} clearcoatRoughness={0.05} sheen={0.8} sheenColor={color} sheenRoughness={0.35} glow={0.2} />
       </mesh>
-      <mesh position={[-0.2, 0.3, 0.45]} scale={[0.5, 0.75, 0.3]}>
+      {/* soft window-light highlight */}
+      <mesh position={[-0.24, 0.3, 0.42]} rotation={[0, 0.35, 0.4]} scale={[0.5, 0.9, 0.3]}>
+        <sphereGeometry args={[0.1, 16, 16]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.55} toneMapped={false} />
+      </mesh>
+      <mesh position={[0.26, 0.05, 0.42]} rotation={[0, -0.3, 0]} scale={[0.25, 0.25, 0.15]}>
         <sphereGeometry args={[0.1, 12, 12]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.6} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.35} toneMapped={false} />
       </mesh>
+      {/* knot */}
       <mesh position={[0, -0.7, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.1, 0.17, 10]} />
-        <meshStandardMaterial color={color} roughness={0.3} />
+        <coneGeometry args={[0.1, 0.16, 14]} />
+        <Toy color={color} roughness={0.35} glow={0.1} />
       </mesh>
-      <mesh position={[0, -1.4, 0]}>
-        <cylinderGeometry args={[0.012, 0.012, 1.25, 4]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.7} />
+      <mesh position={[0, -0.78, 0]}>
+        <torusGeometry args={[0.055, 0.03, 10, 18]} />
+        <Toy color={color} roughness={0.35} glow={0.1} />
+      </mesh>
+      {/* curly string */}
+      <mesh geometry={getStringGeo()}>
+        <meshStandardMaterial color="#ffffff" roughness={0.6} emissive="#ffffff" emissiveIntensity={0.25} />
       </mesh>
       {starGeo && (
-        <mesh geometry={starGeo} position={[0, 0.05, 0.52]}>
-          <meshStandardMaterial color="#ffffff" emissive="#fff7ae" emissiveIntensity={0.6} />
+        <mesh geometry={starGeo} position={[0, 0.05, 0.5]}>
+          <meshStandardMaterial color="#ffffff" emissive="#fff3a0" emissiveIntensity={2.2} roughness={0.25} />
         </mesh>
       )}
     </group>
@@ -121,18 +164,21 @@ function Clouds() {
           ref={(el) => {
             if (el) refs.current[i] = el;
           }}
-          position={[c.x, c.y, -4]}
+          position={[c.x, c.y, -4 - (i % 2)]}
           scale={c.s}
         >
           {[
             [0, 0, 0.9],
-            [0.9, -0.1, 0.65],
-            [-0.9, -0.15, 0.6],
-            [0.4, 0.4, 0.55],
+            [0.95, -0.12, 0.66],
+            [-0.95, -0.17, 0.6],
+            [0.45, 0.45, 0.6],
+            [-0.4, 0.35, 0.55],
+            [1.6, -0.25, 0.42],
+            [-1.6, -0.28, 0.4],
           ].map(([x, y, r], k) => (
-            <mesh key={k} position={[x, y, 0]}>
-              <sphereGeometry args={[r, 14, 14]} />
-              <meshBasicMaterial color="#ffffff" transparent opacity={0.85} />
+            <mesh key={k} position={[x, y, k % 2 ? 0.15 : 0]}>
+              <sphereGeometry args={[r, 20, 20]} />
+              <meshStandardMaterial color="#ffffff" roughness={1} emissive="#e0f2fe" emissiveIntensity={0.35} transparent opacity={0.93} />
             </mesh>
           ))}
         </group>
@@ -193,6 +239,7 @@ function Field() {
   return (
     <>
       <Clouds />
+      <Sparkles count={45} scale={[viewport.width, viewport.height, 3]} size={5} speed={0.35} opacity={0.7} color="#ffffff" />
       {list.map((b) => (
         <Balloon key={b.id} b={b} onPop={onPop} onGone={onGone} />
       ))}
@@ -203,7 +250,7 @@ function Field() {
 
 export default function BalloonPop() {
   return (
-    <Scene3D cameraPosition={[0, 0, 10]}>
+    <Scene3D cameraPosition={[0, 0, 10]} mood="day" bloom={0.5}>
       <Field />
     </Scene3D>
   );

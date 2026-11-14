@@ -222,3 +222,17 @@ src/
 - Code: `src/lib/i18n.ts` (`useT()` -> `t("বাংলা", "English")`), `tt()` for non-React code, `GAME_EN` in `lib/games.ts` for game names/descriptions. To add a string, just write both languages at the call site.
 - **Coins fixed:** before, coins depended only on the star count, so every game paid the same (2/5/10/20). Now `calcCoins()` = score relative to that game's 3-star target (max 40) + a star bonus (0/2/5/10), so different games and scores pay different amounts.
 - Note: coins are saved per browser/device (localStorage), they are not shared between players or devices.
+
+---
+
+## 11. Realistic 3D upgrade (v6)
+
+- **Shared scene (`src/components/3d/Scene3D.tsx`):** studio lighting built from soft-box reflections (nothing is downloaded), key light with soft shadows, coloured rim light, ACES film tone mapping, gentle bloom (glow) on bright things. If a device gets slow, the post effects switch off by themselves (`PerformanceMonitor`).
+- **New files:** `3d/toy.tsx` (glossy toy-plastic and metal materials), `3d/textures.ts` (procedural wood, grass, wicker, stripes, rock, planet textures, no image files).
+- **Balloon Pop:** pear-shaped glossy balloons, knot, curly string, soft 3D clouds, sparkles.
+- **Monster Tap:** striped lawn, wooden rim, flowers, dirt mounds, soft shadows, lit fuzzy monsters (the face is lit too).
+- **Marble Roller:** wooden tray, checkered floor, glossy candy walls, cat's-eye glass marble, glowing gold goal.
+- **Rocket Space Run:** metal and glossy rocket with a glowing flame, craggy textured asteroids, ringed gas-giant planet, glowing stars.
+- **Sweets Catcher:** frosted cupcake with cherry and sprinkles, glazed donut, striped wrapped candy, wicker basket with ribbon.
+- **Rainbow Tunes:** wood-grain frame, glossy bars that glow when played, metal screws.
+- **New packages:** `@react-three/postprocessing`, `postprocessing`. Upload `package.json` and `package-lock.json` too.
