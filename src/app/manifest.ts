@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Maisha Kids Arcade",
     short_name: "Maisha",
-    description: "বাচ্চাদের জন্য ৩ডি গেমস",
+    description: "3D games for kids | বাচ্চাদের জন্য ৩ডি গেমস",
     start_url: "/",
     display: "standalone",
     orientation: "any",

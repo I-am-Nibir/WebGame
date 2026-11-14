@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef } from "react";
+import { useT } from "@/lib/i18n";
 import { Rich } from "@/components/ui/Icons";
 import { useFrame, useThree } from "@react-three/fiber";
 import { RoundedBox } from "@react-three/drei";
@@ -322,13 +323,14 @@ function Field() {
 }
 
 export default function MarbleMaze() {
+  const t = useT();
   return (
     <>
       <Scene3D cameraPosition={[0, 9, 5.5]} lookAt={[0, 0, 0]}>
         <Field />
       </Scene3D>
       <div className="absolute bottom-3 inset-x-0 text-center text-white/90 font-bold pointer-events-none text-sm">
-        <Rich>👆 আঙুল টেনে বোর্ড হেলাও</Rich>
+        <Rich>{t("👆 আঙুল টেনে বোর্ড হেলাও", "👆 Drag to tilt the board")}</Rich>
       </div>
     </>
   );

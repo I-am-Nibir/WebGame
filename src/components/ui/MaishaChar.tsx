@@ -88,7 +88,7 @@ export default function MaishaChar({
       style={{ width: boxW, height: height + 14 }}
       onPointerDown={onTap ? tap : undefined}
       role={onTap ? "button" : "img"}
-      aria-label="মাইশা"
+      aria-label="Maisha"
     >
       <div
         className="absolute left-1/2 -translate-x-1/2 rounded-[50%] bg-indigo-950/30 blur-[2px]"

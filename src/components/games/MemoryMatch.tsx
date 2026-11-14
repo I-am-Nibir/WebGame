@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { Ico, iconName } from "@/components/ui/Icons";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
@@ -19,6 +20,7 @@ function shuffled() {
 }
 
 export default function MemoryMatch() {
+  const t = useT();
   const { active, addScore, finish } = useGame();
   const deck = useMemo(shuffled, []);
   const [flipped, setFlipped] = useState<number[]>([]);
@@ -73,7 +75,7 @@ export default function MemoryMatch() {
 
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center p-4 gap-4">
-      <div className="font-black text-white text-xl bg-black/20 px-5 py-2 rounded-full">চাল: {toBn(moves)}</div>
+      <div className="font-black text-white text-xl bg-black/20 px-5 py-2 rounded-full">{t("চাল", "Moves")}: {toBn(moves)}</div>
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 w-full max-w-md">
         {deck.map((card) => {
           const open = flipped.includes(card.id) || matched.includes(card.emoji);
@@ -82,7 +84,7 @@ export default function MemoryMatch() {
             <button
               key={card.id}
               onClick={() => flip(card.id)}
-              aria-label={open ? iconName(card.emoji) ?? "কার্ড" : "বন্ধ কার্ড"}
+              aria-label={open ? iconName(card.emoji) ?? t("কার্ড", "Card") : t("বন্ধ কার্ড", "Hidden card")}
               className="aspect-square [perspective:700px]"
             >
               <div

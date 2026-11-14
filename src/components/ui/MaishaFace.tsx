@@ -3,7 +3,7 @@ import React from "react";
 /** Cartoon Maisha (hand-drawn SVG — no photo is embedded). */
 export default function MaishaFace({ size = 40, rounded = true, bg = true }: { size?: number; rounded?: boolean; bg?: boolean }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 100 100" role="img" aria-label="মাইশা">
+    <svg width={size} height={size} viewBox="0 0 100 100" role="img" aria-label="Maisha">
       <defs>
         <linearGradient id="mf-bg" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#c4b5fd" />

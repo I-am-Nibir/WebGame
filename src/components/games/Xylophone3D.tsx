@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useT, tt } from "@/lib/i18n";
 import { Rich } from "@/components/ui/Icons";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Html, RoundedBox } from "@react-three/drei";
@@ -10,14 +11,14 @@ import { useBursts } from "@/components/3d/Burst";
 import { sounds } from "@/lib/audioEngine";
 
 const NOTES = [
-  { label: "সা", freq: 261.63, color: "#ef4444" },
-  { label: "রে", freq: 293.66, color: "#f97316" },
-  { label: "গা", freq: 329.63, color: "#facc15" },
-  { label: "মা", freq: 349.23, color: "#22c55e" },
-  { label: "পা", freq: 392.0, color: "#14b8a6" },
-  { label: "ধা", freq: 440.0, color: "#3b82f6" },
-  { label: "নি", freq: 493.88, color: "#6366f1" },
-  { label: "সা", freq: 523.25, color: "#a855f7" },
+  { label: "সা", en: "Do", freq: 261.63, color: "#ef4444" },
+  { label: "রে", en: "Re", freq: 293.66, color: "#f97316" },
+  { label: "গা", en: "Mi", freq: 329.63, color: "#facc15" },
+  { label: "মা", en: "Fa", freq: 349.23, color: "#22c55e" },
+  { label: "পা", en: "Sol", freq: 392.0, color: "#14b8a6" },
+  { label: "ধা", en: "La", freq: 440.0, color: "#3b82f6" },
+  { label: "নি", en: "Ti", freq: 493.88, color: "#6366f1" },
+  { label: "সা", en: "Do", freq: 523.25, color: "#a855f7" },
 ];
 /** "Twinkle Twinkle Little Star" as indices into NOTES */
 const TWINKLE = [0, 0, 4, 4, 5, 5, 4, 3, 3, 2, 2, 1, 1, 0];
@@ -80,7 +81,7 @@ function Bar({
         </mesh>
       ))}
       <Html center pointerEvents="none" position={[0, 0, 0.25]}>
-        <span style={{ color: "white", fontWeight: 900, fontSize: 24, textShadow: "0 2px 4px rgba(0,0,0,.35)" }}>{note.label}</span>
+        <span style={{ color: "white", fontWeight: 900, fontSize: 24, textShadow: "0 2px 4px rgba(0,0,0,.35)" }}>{tt(note.label, note.en)}</span>
       </Html>
     </group>
   );
@@ -136,6 +137,7 @@ function Field({
 }
 
 export default function Xylophone3D() {
+  const t = useT();
   const pressed = useRef<number[]>(Array(8).fill(0));
   const playRef = useRef<((i: number) => void) | null>(null);
   const [hintOn, setHintOn] = useState(false);
@@ -169,7 +171,7 @@ export default function Xylophone3D() {
           }}
           className="pointer-events-auto px-6 py-3 rounded-2xl font-black text-lg text-purple-950 clay-btn-yellow"
         >
-          <Rich>{`🌟 তারার গান শেখো: ${hintOn ? "চালু" : "বন্ধ"}`}</Rich>
+          <Rich>{t(`🌟 তারার গান শেখো: ${hintOn ? "চালু" : "বন্ধ"}`, `🌟 Twinkle helper: ${hintOn ? "on" : "off"}`)}</Rich>
         </button>
       </div>
     </div>

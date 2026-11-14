@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { tt } from "@/lib/i18n";
 import { drawIcon, getIconImage } from "@/lib/iconImage";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
@@ -150,7 +151,7 @@ export default function FruitSlice() {
         const s = 80 + Math.random() * 200;
         drops.push({ x: it.x, y: it.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 60, life: 0.6, color: it.color });
       }
-      pops.push({ x: it.x, y: it.y - 30, text: combo >= 3 ? `কম্বো ×${toBn(combo)}!` : `+${toBn(pts)}`, life: 0.9 });
+      pops.push({ x: it.x, y: it.y - 30, text: combo >= 3 ? tt(`কম্বো ×${toBn(combo)}!`, `Combo ×${toBn(combo)}!`) : `+${toBn(pts)}`, life: 0.9 });
     };
 
     const pos = (e: PointerEvent) => {

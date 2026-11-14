@@ -6,7 +6,8 @@ import confetti from "canvas-confetti";
 import MaishaChar from "@/components/ui/MaishaChar";
 import { Ico, Rich } from "@/components/ui/Icons";
 import { ArrowLeft, Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
-import { COINS_BY_STARS, type GameMeta } from "@/lib/games";
+import { calcCoins, gameText, type GameMeta } from "@/lib/games";
+import { useLang, useT } from "@/lib/i18n";
 import { useGameStore } from "@/lib/store";
 import { sounds } from "@/lib/audioEngine";
 import { toBn } from "@/lib/format";
@@ -71,6 +72,9 @@ export default function GameShell({
   const recordResult = useGameStore((s) => s.recordResult);
   const soundEnabled = useGameStore((s) => s.soundEnabled);
   const toggleSound = useGameStore((s) => s.toggleSound);
+  const t = useT();
+  const lang = useLang((s) => s.lang);
+  const gt = gameText(meta, lang);
 
   const duration = meta.duration ?? 0;
   const [status, setStatus] = useState<GameStatus>(meta.freePlay ? "playing" : "ready");
@@ -100,7 +104,7 @@ export default function GameShell({
     statusRef.current = "over";
     const finalScore = scoreRef.current;
     const stars = meta.stars.filter((t) => finalScore >= t).length;
-    const coins = COINS_BY_STARS[stars];
+    const coins = calcCoins(finalScore, stars, meta);
     const prevBest = useGameStore.getState().highScores[meta.id] ?? 0;
     addCoins(coins);
     recordResult(meta.id, finalScore, stars);
@@ -175,16 +179,16 @@ export default function GameShell({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label={meta.name}
+        aria-label={gt.name}
         className={`fixed inset-0 z-50 flex flex-col animate-fade-in ${meta.bg}`}
       >
         <header className="flex items-center gap-2 px-3 py-2 bg-black/25 backdrop-blur text-white">
-          <button onClick={onClose} aria-label="ফিরে যাও" className={iconBtn}>
+          <button onClick={onClose} aria-label={t("ফিরে যাও", "Back")} className={iconBtn}>
             <ArrowLeft size={26} />
           </button>
           <div className="flex items-center gap-2 font-black text-lg min-w-0">
             <Ico n={meta.icon} size={34} />
-            <span className="truncate">{meta.name}</span>
+            <span className="truncate">{gt.name}</span>
           </div>
           <div className="ml-auto flex items-center gap-2">
             {!meta.freePlay && (
@@ -193,11 +197,11 @@ export default function GameShell({
               </div>
             )}
             {!meta.freePlay && status === "playing" && (
-              <button onClick={() => setPaused((p) => !p)} aria-label={paused ? "চালিয়ে যাও" : "বিরতি"} className={iconBtn}>
+              <button onClick={() => setPaused((p) => !p)} aria-label={paused ? t("চালিয়ে যাও", "Resume") : t("বিরতি", "Pause")} className={iconBtn}>
                 {paused ? <Play size={24} /> : <Pause size={24} />}
               </button>
             )}
-            <button onClick={toggleSound} aria-label={soundEnabled ? "সাউন্ড বন্ধ করো" : "সাউন্ড চালু করো"} className={iconBtn}>
+            <button onClick={toggleSound} aria-label={soundEnabled ? t("সাউন্ড বন্ধ করো", "Sound off") : t("সাউন্ড চালু করো", "Sound on")} className={iconBtn}>
               {soundEnabled ? <Volume2 size={24} /> : <VolumeX size={24} />}
             </button>
           </div>
@@ -223,10 +227,10 @@ export default function GameShell({
               <div className="flex justify-center mb-1">
                 <Ico n={meta.icon} size={56} />
               </div>
-              <h2 className="text-2xl font-black text-purple-950 mb-2">{meta.name}</h2>
-              <p className="text-slate-600 font-semibold mb-5 leading-relaxed">{meta.howTo}</p>
+              <h2 className="text-2xl font-black text-purple-950 mb-2">{gt.name}</h2>
+              <p className="text-slate-600 font-semibold mb-5 leading-relaxed"><Rich>{gt.howTo}</Rich></p>
               <button onClick={begin} className="w-full py-4 rounded-2xl font-black text-2xl text-purple-950 clay-btn-yellow">
-                <Rich>শুরু করো! 🚀</Rich>
+                <Rich>{t("শুরু করো! 🚀", "Start! 🚀")}</Rich>
               </button>
             </Overlay>
           )}
@@ -234,13 +238,13 @@ export default function GameShell({
           {status === "playing" && paused && (
             <Overlay>
               <div className="flex justify-center mb-2"><Ico n="⏸️" size={64} /></div>
-              <h2 className="text-2xl font-black text-purple-950 mb-5">বিরতি</h2>
+              <h2 className="text-2xl font-black text-purple-950 mb-5">{t("বিরতি", "Paused")}</h2>
               <div className="space-y-3">
                 <button onClick={() => setPaused(false)} className="w-full py-4 rounded-2xl font-black text-xl text-purple-950 clay-btn-yellow">
-                  চালিয়ে যাও
+                  {t("চালিয়ে যাও", "Resume")}
                 </button>
                 <button onClick={onClose} className="w-full py-3 rounded-2xl font-black text-lg text-white clay-btn-purple">
-                  বাইরে যাও
+                  {t("বাইরে যাও", "Quit")}
                 </button>
               </div>
             </Overlay>
@@ -252,9 +256,9 @@ export default function GameShell({
                 <MaishaChar mode={result.stars >= 1 ? "victory" : "chill"} height={140} sparkles={false} />
               </div>
               <h2 className="text-2xl font-black text-purple-950 mb-1">
-                <Rich>{result.stars === 3 ? "দারুণ! 🎉" : result.stars >= 1 ? "খুব ভালো! 👏" : "আবার চেষ্টা করো! 💪"}</Rich>
+                <Rich>{result.stars === 3 ? t("দারুণ! 🎉", "Awesome! 🎉") : result.stars >= 1 ? t("খুব ভালো! 👏", "Well done! 👏") : t("আবার চেষ্টা করো! 💪", "Try again! 💪")}</Rich>
               </h2>
-              <div className="flex justify-center gap-2 my-3" aria-label={`${result.stars} তারা`}>
+              <div className="flex justify-center gap-2 my-3" aria-label={t(`${result.stars} তারা`, `${result.stars} stars`)}>
                 {[0, 1, 2].map((i) => (
                   <motion.span
                     key={i}
@@ -267,17 +271,17 @@ export default function GameShell({
                   </motion.span>
                 ))}
               </div>
-              <p className="text-xl font-black text-slate-800">স্কোর: {toBn(result.score)}</p>
-              <p className="text-amber-600 font-black text-lg flex items-center justify-center gap-1">+{toBn(result.coins)} কয়েন <Ico n="⭐" size="1.3em" /></p>
+              <p className="text-xl font-black text-slate-800">{t("স্কোর", "Score")}: {toBn(result.score)}</p>
+              <p className="text-amber-600 font-black text-lg flex items-center justify-center gap-1">+{toBn(result.coins)} {t("কয়েন", "coins")} <Ico n="⭐" size="1.3em" /></p>
               <p className="text-slate-500 font-bold mb-5">
-                <Rich>{result.newBest ? "🏆 নতুন রেকর্ড!" : `সেরা স্কোর: ${toBn(result.best)}`}</Rich>
+                <Rich>{result.newBest ? t("🏆 নতুন রেকর্ড!", "🏆 New record!") : `${t("সেরা স্কোর", "Best score")}: ${toBn(result.best)}`}</Rich>
               </p>
               <div className="space-y-3">
                 <button onClick={begin} className="w-full py-4 rounded-2xl font-black text-xl text-purple-950 clay-btn-yellow flex items-center justify-center gap-2">
-                  <RotateCcw size={22} /> আবার খেলো
+                  <RotateCcw size={22} /> {t("আবার খেলো", "Play again")}
                 </button>
                 <button onClick={onClose} className="w-full py-3 rounded-2xl font-black text-lg text-white clay-btn-purple">
-                  অন্য গেম
+                  {t("অন্য গেম", "Other games")}
                 </button>
               </div>
             </Overlay>

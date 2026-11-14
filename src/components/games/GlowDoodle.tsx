@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { drawIcon, getIconImage } from "@/lib/iconImage";
 import { Ico } from "@/components/ui/Icons";
 import { Download, Eraser, Trash2, Undo2 } from "lucide-react";
@@ -55,6 +56,7 @@ function drawStroke(ctx: CanvasRenderingContext2D, s: Stroke) {
 }
 
 export default function GlowDoodle() {
+  const t = useT();
   const wrapRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const strokes = useRef<Stroke[]>([]);
@@ -193,7 +195,7 @@ export default function GlowDoodle() {
             <button
               key={c}
               onClick={() => pickColor(c)}
-              aria-label={`রঙ ${c}`}
+              aria-label={t(`রঙ ${c}`, `Colour ${c}`)}
               className={`w-12 h-12 shrink-0 rounded-full border-4 transition active:scale-95 ${
                 color === c && !rainbow && !eraser && !stamp ? "border-white scale-110" : "border-white/30"
               }`}
@@ -207,14 +209,14 @@ export default function GlowDoodle() {
               setEraser(false);
               setStamp(null);
             }}
-            aria-label="রংধনু ব্রাশ"
+            aria-label={t("রংধনু ব্রাশ", "Rainbow brush")}
             className={`w-12 h-12 shrink-0 rounded-full border-4 transition active:scale-95 ${rainbow && !stamp ? "border-white scale-110" : "border-white/30"}`}
             style={{ background: "conic-gradient(red, orange, yellow, lime, cyan, blue, magenta, red)" }}
           />
         </div>
         <div className="flex gap-2 items-center overflow-x-auto">
           {SIZES.map((s) => (
-            <button key={s} onClick={() => setSize(s)} aria-label={`ব্রাশ ${s}`} className={toolBtn(size === s)}>
+            <button key={s} onClick={() => setSize(s)} aria-label={t(`ব্রাশ ${s}`, `Brush ${s}`)} className={toolBtn(size === s)}>
               <span className="rounded-full bg-current" style={{ width: s * 0.9 + 4, height: s * 0.9 + 4 }} />
             </button>
           ))}
@@ -227,7 +229,7 @@ export default function GlowDoodle() {
                 setStamp(stamp === s ? null : s);
                 setEraser(false);
               }}
-              aria-label="স্ট্যাম্প"
+              aria-label={t("স্ট্যাম্প", "Stamp")}
               className={toolBtn(stamp === s)}
             >
               <Ico n={s} size={28} />
@@ -240,18 +242,18 @@ export default function GlowDoodle() {
               setStamp(null);
               setRainbow(false);
             }}
-            aria-label="রাবার"
+            aria-label={t("রাবার", "Eraser")}
             className={toolBtn(eraser)}
           >
             <Eraser size={24} />
           </button>
-          <button onClick={undo} aria-label="আগের ধাপে যাও" className={toolBtn(false)}>
+          <button onClick={undo} aria-label={t("আগের ধাপে যাও", "Undo")} className={toolBtn(false)}>
             <Undo2 size={24} />
           </button>
-          <button onClick={clear} aria-label="সব মুছে ফেলো" className={toolBtn(false)}>
+          <button onClick={clear} aria-label={t("সব মুছে ফেলো", "Clear all")} className={toolBtn(false)}>
             <Trash2 size={24} />
           </button>
-          <button onClick={save} aria-label="ছবি সেভ করো" className={toolBtn(false)}>
+          <button onClick={save} aria-label={t("ছবি সেভ করো", "Save picture")} className={toolBtn(false)}>
             <Download size={24} />
           </button>
         </div>

@@ -1,21 +1,23 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { Ico, Rich } from "@/components/ui/Icons";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
 import { toBn } from "@/lib/format";
 
 const PADS = [
-  { name: "লাল", freq: 261.63, from: "#fb7185", to: "#e11d48", shade: "#9f1239" },
-  { name: "নীল", freq: 329.63, from: "#60a5fa", to: "#2563eb", shade: "#1e3a8a" },
-  { name: "সবুজ", freq: 392.0, from: "#4ade80", to: "#16a34a", shade: "#14532d" },
-  { name: "হলুদ", freq: 523.25, from: "#fde047", to: "#eab308", shade: "#854d0e" },
+  { name: "লাল", en: "Red", freq: 261.63, from: "#fb7185", to: "#e11d48", shade: "#9f1239" },
+  { name: "নীল", en: "Blue", freq: 329.63, from: "#60a5fa", to: "#2563eb", shade: "#1e3a8a" },
+  { name: "সবুজ", en: "Green", freq: 392.0, from: "#4ade80", to: "#16a34a", shade: "#14532d" },
+  { name: "হলুদ", en: "Yellow", freq: 523.25, from: "#fde047", to: "#eab308", shade: "#854d0e" },
 ];
 
 type Phase = "idle" | "watch" | "play";
 
 export default function SimonBeat() {
+  const t = useT();
   const { active, addScore, finish } = useGame();
   const [phase, setPhase] = useState<Phase>("idle");
   const [lit, setLit] = useState(-1);
@@ -117,13 +119,19 @@ export default function SimonBeat() {
   };
 
   const status =
-    phase === "watch" ? "দেখো 👀" : phase === "play" ? "এবার তুমি! 👆" : lives < 3 && lives > 0 ? "ভুল! আবার দেখো 😅" : "...";
+    phase === "watch"
+      ? t("দেখো 👀", "Watch 👀")
+      : phase === "play"
+        ? t("এবার তুমি! 👆", "Your turn! 👆")
+        : lives < 3 && lives > 0
+          ? t("ভুল! আবার দেখো 😅", "Oops! Watch again 😅")
+          : "...";
 
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 p-4">
       <div className="flex items-center gap-4 text-white font-black text-xl">
-        <span className="bg-white/15 px-4 py-1.5 rounded-full">রাউন্ড {toBn(round)}</span>
-        <span aria-label={`${lives} জীবন`}>
+        <span className="bg-white/15 px-4 py-1.5 rounded-full">{t("রাউন্ড", "Round")} {toBn(round)}</span>
+        <span aria-label={t(`${lives} জীবন`, `${lives} lives`)}>
           {[0, 1, 2].map((i) => (
             <span key={i} className={i < lives ? "" : "grayscale opacity-30"}>
               <Ico n="❤️" size={30} />
@@ -141,7 +149,7 @@ export default function SimonBeat() {
             <button
               key={p.name}
               onPointerDown={() => void press(i)}
-              aria-label={p.name}
+              aria-label={t(p.name, p.en)}
               disabled={phase !== "play"}
               className="rounded-[2rem] border-4 border-white/70 transition-all duration-100 disabled:cursor-default"
               style={{

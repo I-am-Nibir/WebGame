@@ -15,7 +15,14 @@ export interface GameMeta {
   stars: [number, number, number];
 }
 
-export const COINS_BY_STARS = [2, 5, 10, 20];
+/** Extra coins for reaching 0/1/2/3 stars. */
+export const STAR_BONUS = [0, 2, 5, 10];
+
+/** Coins depend on the score itself (relative to the game's 3-star target) plus a star bonus, so every game/score pays differently. */
+export function calcCoins(score: number, stars: number, meta: Pick<GameMeta, "stars">): number {
+  const target = meta.stars[2] || 1;
+  return Math.min(40, Math.round((score * 15) / target)) + STAR_BONUS[stars];
+}
 
 export const GAMES: GameMeta[] = [
   {
@@ -178,3 +185,22 @@ export const CARD_ART: Record<string, { art: [string, string, string]; panel: st
   tictactoe: { art: ["☀️", "🌙", "⭐"], panel: "bg-amber-200" },
   doodle: { art: ["🎨", "🖌️", "🌈"], panel: "bg-fuchsia-200" },
 };
+
+export const GAME_EN: Record<string, { name: string; desc: string; howTo: string }> = {
+  balloon: { name: "Balloon Pop Frenzy", desc: "Pop colourful 3D balloons", howTo: "Tap the flying balloons. Golden star balloons give more points!" },
+  whack: { name: "Monster Tap", desc: "Catch Abir Kaku's monster face!", howTo: "Tap the Abir Kaku monster as soon as it pops out of a hole, before it runs away!" },
+  xylophone: { name: "3D Rainbow Tunes", desc: "A musical xylophone", howTo: "Tap the colourful bars or slide your finger to play a tune!" },
+  catch: { name: "Sweets Catcher", desc: "Catch cakes in the basket", howTo: "Move your finger or mouse to catch the falling sweets in your basket!" },
+  maze: { name: "Marble Roller", desc: "A 3D balancing maze", howTo: "Drag to tilt the board. Collect the stars and drop the marble in the golden hole!" },
+  space: { name: "Rocket Space Run", desc: "Fly past the space rocks", howTo: "Tap the left or right side of the screen to change lanes. Dodge rocks, grab stars!" },
+  slice: { name: "Candy Slicer", desc: "A fast slicing game", howTo: "Swipe to slice flying fruits and candies! Slice many in a row for a combo bonus." },
+  memory: { name: "Card Memory Match", desc: "Find the matching pictures", howTo: "Flip two cards to find a matching pair. The fewer moves, the more stars!" },
+  simon: { name: "Simon Beat Jam", desc: "Memory and beat repeat", howTo: "Watch which colours light up, then tap them in the same order. You have three hearts!" },
+  math: { name: "Math Bubble Splash", desc: "Fun adding and subtracting puzzles", howTo: "Tap the bubble with the right answer. Be quick and keep a streak for a bonus!" },
+  tictactoe: { name: "Sun vs Moon", desc: "Play against a smart robot", howTo: "You are ☀️, the robot is 🌙. Get three in a row to win!" },
+  doodle: { name: "Magic Glow Art", desc: "Neon drawing and stamps", howTo: "Draw with your finger, add stamps and save your picture!" },
+};
+
+/** Localised name/desc/howTo for a game. */
+export const gameText = (g: GameMeta, lang: "bn" | "en") =>
+  lang === "en" && GAME_EN[g.id] ? GAME_EN[g.id] : { name: g.name, desc: g.desc, howTo: g.howTo };

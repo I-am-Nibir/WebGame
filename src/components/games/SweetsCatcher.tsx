@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { Rich } from "@/components/ui/Icons";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
@@ -243,13 +244,14 @@ function Field() {
 }
 
 export default function SweetsCatcher() {
+  const t = useT();
   return (
     <>
       <Scene3D cameraPosition={[0, 0, 10]}>
         <Field />
       </Scene3D>
       <div className="absolute bottom-2 inset-x-0 text-center text-white/80 font-bold pointer-events-none text-sm">
-        <Rich>👆 আঙুল বা মাউস সরাও</Rich>
+        <Rich>{t("👆 আঙুল বা মাউস সরাও", "👆 Move your finger or mouse")}</Rich>
       </div>
     </>
   );

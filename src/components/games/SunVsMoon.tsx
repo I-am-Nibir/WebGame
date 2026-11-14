@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { Ico, Rich } from "@/components/ui/Icons";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
@@ -45,6 +46,7 @@ function robotMove(b: Cell[]): number {
 }
 
 export default function SunVsMoon() {
+  const t = useT();
   const { active, addScore, finish } = useGame();
   const [board, setBoard] = useState<Cell[]>(Array(9).fill(null));
   const [turn, setTurn] = useState<"S" | "M">("S");
@@ -100,13 +102,13 @@ export default function SunVsMoon() {
 
   const status = over
     ? result?.who === "S"
-      ? "তুমি জিতে গেছো! 🎉"
+      ? t("তুমি জিতে গেছো! 🎉", "You win! 🎉")
       : result?.who === "M"
-        ? "রোবট জিতল! 🤖"
-        : "ড্র! 🤝"
+        ? t("রোবট জিতল! 🤖", "Robot wins! 🤖")
+        : t("ড্র! 🤝", "Draw! 🤝")
     : turn === "S"
-      ? "তোমার পালা ☀️"
-      : "রোবট ভাবছে 🤖";
+      ? t("তোমার পালা ☀️", "Your turn ☀️")
+      : t("রোবট ভাবছে 🤖", "Robot is thinking 🤖");
 
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-4">
@@ -121,7 +123,7 @@ export default function SunVsMoon() {
               <button
                 key={i}
                 onClick={() => tap(i)}
-                aria-label={c === "S" ? "সূর্য" : c === "M" ? "চাঁদ" : "খালি ঘর"}
+                aria-label={c === "S" ? t("সূর্য", "Sun") : c === "M" ? t("চাঁদ", "Moon") : "empty"}
                 className={`aspect-square rounded-2xl text-6xl flex items-center justify-center transition active:scale-95 ${
                   win ? "bg-yellow-200 shadow-[0_6px_0_#ca8a04] animate-bob" : "bg-amber-50 shadow-[0_6px_0_#d6b98a]"
                 }`}

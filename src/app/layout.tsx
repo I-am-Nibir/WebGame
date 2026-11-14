@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import LangInit from "@/components/ui/LangInit";
 
 export const metadata: Metadata = {
   title: "Maisha - Kids 3D Gaming Arcade",
-  description: "বাচ্চাদের জন্য 3D গেমস, শেখা ও আনন্দের নিরাপদ প্ল্যাটফর্ম",
+  description: "Safe 3D games for kids — play, learn and have fun! | বাচ্চাদের জন্য ৩ডি গেমস, শেখা ও আনন্দের নিরাপদ প্ল্যাটফর্ম",
   applicationName: "Maisha Arcade",
 };
 
@@ -20,7 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="bn">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <LangInit />
+        {children}
+      </body>
     </html>
   );
 }

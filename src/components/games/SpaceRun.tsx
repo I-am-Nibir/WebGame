@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useT } from "@/lib/i18n";
 import { Ico } from "@/components/ui/Icons";
 import { useFrame } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
@@ -205,6 +206,7 @@ function Field({ laneRef, onHurt }: { laneRef: React.MutableRefObject<number>; o
 }
 
 export default function SpaceRun() {
+  const t = useT();
   const { active, finish } = useGame();
   const lane = useRef(1);
   const [lives, setLives] = useState(3);
@@ -248,7 +250,7 @@ export default function SpaceRun() {
       <Scene3D cameraPosition={[0, 2.8, 7.5]} lookAt={[0, 0.4, -8]} fov={60}>
         <Field laneRef={lane} onHurt={onHurt} />
       </Scene3D>
-      <div className="absolute left-3 top-3 flex gap-1 text-3xl pointer-events-none" aria-label={`${lives} জীবন`}>
+      <div className="absolute left-3 top-3 flex gap-1 text-3xl pointer-events-none" aria-label={t(`${lives} জীবন`, `${lives} lives`)}>
         {[0, 1, 2].map((i) => (
           <span key={i} className={i < lives ? "" : "grayscale opacity-30"}>
             <Ico n="❤️" size={34} />

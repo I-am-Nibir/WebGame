@@ -213,3 +213,12 @@ src/
 **Privacy note:** anything in `public/` is public once the site is online. `public/photos/abir-face.webp` is Abir's photo crop — remove/replace it if you don't want that public. Maisha's own photos are NOT in the project (only the cartoon art).
 
 **To add a new icon:** add an entry to `DRAW` and `EMOJI_MAP` in `Icons.tsx`.
+
+---
+
+## 10. English + Bangla, and per-score coins
+
+- Language pill **বাংলা | EN** in the top bar (saved in the browser, applied after load so there is no hydration glitch). Everything is translated: home, game cards, how-to text, start/pause/result screens, mascot talk, in-game labels, numbers (Bangla digits <-> normal digits).
+- Code: `src/lib/i18n.ts` (`useT()` -> `t("বাংলা", "English")`), `tt()` for non-React code, `GAME_EN` in `lib/games.ts` for game names/descriptions. To add a string, just write both languages at the call site.
+- **Coins fixed:** before, coins depended only on the star count, so every game paid the same (2/5/10/20). Now `calcCoins()` = score relative to that game's 3-star target (max 40) + a star bonus (0/2/5/10), so different games and scores pay different amounts.
+- Note: coins are saved per browser/device (localStorage), they are not shared between players or devices.
