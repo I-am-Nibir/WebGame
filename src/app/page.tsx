@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import { Volume2, VolumeX } from "lucide-react";
 import GameShell from "@/components/ui/GameShell";
+import HeroBanner from "@/components/ui/HeroBanner";
 import { GAME_COMPONENTS } from "@/components/games";
 import { GAMES, getGame } from "@/lib/games";
 import { AVATARS } from "@/lib/avatars";
@@ -17,6 +18,21 @@ const MascotCanvas = dynamic(() => import("@/components/3d/MascotCanvas"), {
   ssr: false,
   loading: () => <div className="h-72 md:h-96 grid place-items-center text-7xl animate-bounce">🧸</div>,
 });
+
+const PANELS: Record<string, string> = {
+  balloon: "from-sky-100 to-indigo-100",
+  whack: "from-orange-100 to-amber-200",
+  xylophone: "from-violet-100 to-fuchsia-100",
+  catch: "from-pink-100 to-rose-200",
+  maze: "from-teal-100 to-emerald-200",
+  space: "from-indigo-200 to-purple-200",
+  slice: "from-rose-100 to-pink-200",
+  memory: "from-purple-100 to-violet-200",
+  simon: "from-yellow-100 to-amber-200",
+  math: "from-cyan-100 to-sky-200",
+  tictactoe: "from-orange-100 to-yellow-200",
+  doodle: "from-fuchsia-100 to-pink-200",
+};
 
 function Stars({ count }: { count: number }) {
   return (
@@ -110,14 +126,29 @@ export default function ArcadeHome() {
   const selected = selectedId ? getGame(selectedId) : null;
   const Game = selectedId ? GAME_COMPONENTS[selectedId] : null;
 
+  const goToGames = () => {
+    sounds.pop();
+    document.getElementById("games")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
-    <main className="min-h-screen bg-[#f7f5ff] text-slate-800 pb-16">
-      <nav className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b-4 border-purple-100 px-4 sm:px-6 py-3 flex items-center justify-between shadow-sm gap-2">
-        <div className="flex items-center gap-2">
-          <span className="text-3xl sm:text-4xl animate-bob">🧸</span>
-          <span className="text-3xl sm:text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400">
+    <main className="min-h-screen confetti-bg text-slate-800 pb-16">
+      <nav className="sticky top-0 z-40 bg-[#fff8ee]/90 backdrop-blur-md px-4 sm:px-8 py-3 flex items-center justify-between gap-3 shadow-[0_4px_0_rgba(167,139,250,0.25)]">
+        <div className="flex items-center gap-8">
+          <span className="text-4xl sm:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-violet-500 via-fuchsia-500 to-amber-400 drop-shadow-[0_3px_0_#4c1d95] select-none">
             Maisha
           </span>
+          <div className="hidden md:flex items-center gap-2 font-black text-lg text-purple-900">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="px-5 py-2 rounded-full bg-purple-100 hover:bg-purple-200 transition"
+            >
+              হোম
+            </button>
+            <button onClick={goToGames} className="px-5 py-2 rounded-full hover:bg-purple-100 transition">
+              ৩ডি গেমস
+            </button>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -127,45 +158,58 @@ export default function ArcadeHome() {
               setShowAvatars(true);
             }}
             aria-label="আমার বন্ধু বদলাও"
-            className="w-12 h-12 rounded-full bg-purple-50 border-2 border-purple-200 text-2xl flex items-center justify-center hover:bg-purple-100 active:scale-95 transition"
+            className="w-12 h-12 rounded-full bg-purple-100 border-2 border-purple-300 text-2xl flex items-center justify-center hover:bg-purple-200 active:scale-95 transition"
           >
             {hydrated ? avatar : "🐰"}
           </button>
           <button
             onClick={toggleSound}
             aria-label={soundEnabled ? "সাউন্ড বন্ধ করো" : "সাউন্ড চালু করো"}
-            className="w-12 h-12 rounded-full bg-purple-50 border-2 border-purple-200 text-purple-700 flex items-center justify-center hover:bg-purple-100 active:scale-95 transition"
+            className="w-12 h-12 rounded-full bg-purple-100 border-2 border-purple-300 text-purple-700 flex items-center justify-center hover:bg-purple-200 active:scale-95 transition"
           >
             {hydrated && !soundEnabled ? <VolumeX size={24} /> : <Volume2 size={24} />}
           </button>
-          <div className="flex items-center gap-2 bg-amber-100 border-2 border-amber-300 px-3 sm:px-4 h-12 rounded-2xl shadow-sm" aria-label="কয়েন">
-            <span className="text-2xl">⭐</span>
-            <span className="font-black text-amber-800 text-lg">{toBn(hydrated ? coins : 0)}</span>
+          <div
+            className="flex items-center gap-2 bg-gradient-to-b from-yellow-200 to-amber-400 border-2 border-amber-100 px-3 sm:px-5 h-12 rounded-full shadow-[0_4px_0_#d97706,0_8px_16px_rgba(245,158,11,0.35)]"
+            aria-label="কয়েন"
+          >
+            <span className="text-2xl drop-shadow">⭐</span>
+            <span className="font-black text-amber-950 text-xl">{toBn(hydrated ? coins : 0)}</span>
           </div>
         </div>
       </nav>
 
       <section className="max-w-6xl mx-auto mt-6 px-4">
-        <div className="bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-[2.5rem] p-6 md:p-8 text-white relative overflow-hidden shadow-2xl flex flex-col md:flex-row items-center justify-between">
-          <div className="z-10 max-w-lg space-y-4 text-center md:text-left">
-            <span className="inline-block px-4 py-1.5 bg-yellow-300 text-purple-950 font-black rounded-full text-sm">
-              ✨ বাচ্চাদের নিরাপদ গেমিং জোন
-            </span>
-            <h1 className="text-3xl md:text-5xl font-black leading-tight">মাইশার সাথে খেলো, শেখো এবং আনন্দ করো!</h1>
-            <p className="text-purple-100 font-medium text-lg">
-              ৩ডি বন্ধুকে ছুঁয়ে দেখো। মাঝে মাঝে বোনাস স্টার কয়েন পাবে!
-            </p>
+        <HeroBanner>
+          <div className="flex flex-col md:flex-row items-center justify-between px-6 md:px-10 pt-20 md:pt-6">
+            <div className="max-w-lg space-y-4 text-center md:text-left md:pb-10">
+              <p className="text-yellow-300 font-black text-xl md:text-2xl">খেলো, শেখো আর আনন্দ করো! ✨</p>
+              <h1 className="text-4xl md:text-6xl font-black leading-tight text-white [text-shadow:0_4px_0_rgba(76,29,149,0.55)]">
+                মাইশার ৩ডি আর্কেডে
+                <br />
+                <span className="text-yellow-300">স্বাগতম! 🎮</span>
+              </h1>
+              <p className="text-purple-100 font-semibold text-lg">
+                ৩ডি বন্ধুকে ছুঁয়ে দেখো, মজার গেম খেলো আর স্টার কয়েন জমাও!
+              </p>
+              <button
+                onClick={goToGames}
+                className="mt-2 px-8 py-4 rounded-full font-black text-xl text-white clay-btn-orange"
+              >
+                খেলা শুরু করো! 🚀
+              </button>
+            </div>
+            <div className="w-full md:w-1/2 flex justify-center">
+              <MascotCanvas paused={!!selectedId || showAvatars} />
+            </div>
           </div>
-          <div className="w-full md:w-1/2 flex justify-center">
-            <MascotCanvas paused={!!selectedId || showAvatars} />
-          </div>
-        </div>
+        </HeroBanner>
       </section>
 
-      <section className="max-w-6xl mx-auto mt-10 px-4">
+      <section id="games" className="max-w-6xl mx-auto mt-12 px-4 scroll-mt-24">
         <div className="flex items-center justify-between mb-6 gap-2">
           <h2 className="text-2xl md:text-3xl font-black text-purple-950 flex items-center gap-3">
-            <span>🎮</span> জনপ্রিয় গেমস
+            <span>🎮</span> জনপ্রিয় মিনি-গেমস
           </h2>
           <span className="text-purple-700 font-bold bg-purple-100 px-4 py-1.5 rounded-full text-sm whitespace-nowrap">
             {toBn(GAMES.length)}টি মজার খেলা
@@ -181,27 +225,31 @@ export default function ArcadeHome() {
                 key={game.id}
                 whileHover={{ y: -8, scale: 1.02 }}
                 whileTap={{ scale: 0.96 }}
-                className="clay-card relative p-6 flex flex-col items-center text-center group"
+                className="group relative flex flex-col items-center text-center rounded-[2rem] border-[6px] border-violet-600 bg-[#fffaf1] p-4 shadow-[0_10px_0_#5b21b6,0_18px_28px_rgba(91,33,182,0.25)]"
                 onClick={() => {
                   sounds.pop();
                   setSelectedId(game.id);
                 }}
               >
-                <span
-                  className={`absolute top-3 right-3 text-xs font-black px-2.5 py-1 rounded-full ${
-                    game.is3d ? "bg-purple-600 text-white" : "bg-slate-200 text-slate-600"
-                  }`}
-                >
-                  {game.is3d ? "৩ডি" : "২ডি"}
-                </span>
+                <h3 className="font-black text-xl text-purple-950 mb-3 leading-tight min-h-[3rem] flex items-center">
+                  {game.name}
+                </h3>
                 <div
-                  className={`w-20 h-20 rounded-2xl bg-gradient-to-tr ${game.color} flex items-center justify-center text-4xl shadow-md mb-4 group-hover:rotate-6 transition`}
+                  className={`relative w-full aspect-[4/3] rounded-2xl bg-gradient-to-br ${PANELS[game.id] ?? "from-purple-100 to-pink-100"} flex items-center justify-center overflow-hidden`}
                 >
-                  {game.icon}
+                  <span
+                    className={`absolute top-2 right-2 text-xs font-black px-2.5 py-1 rounded-full ${
+                      game.is3d ? "bg-violet-600 text-white" : "bg-white/80 text-slate-600"
+                    }`}
+                  >
+                    {game.is3d ? "৩ডি" : "২ডি"}
+                  </span>
+                  <span className="text-7xl drop-shadow-[0_8px_6px_rgba(76,29,149,0.25)] group-hover:scale-110 group-hover:-rotate-6 transition-transform">
+                    {game.icon}
+                  </span>
                 </div>
-                <h3 className="font-black text-xl text-slate-800 mb-1">{game.name}</h3>
-                <p className="text-slate-500 text-sm font-medium mb-3">{game.desc}</p>
-                <div className="h-7 mb-3 text-sm font-bold text-amber-700">
+                <p className="text-slate-500 text-sm font-semibold mt-3">{game.desc}</p>
+                <div className="h-7 my-2 text-sm font-bold text-amber-700">
                   {game.freePlay ? (
                     <span className="text-emerald-600">🎶 ফ্রি খেলা</span>
                   ) : best > 0 ? (
@@ -212,7 +260,7 @@ export default function ArcadeHome() {
                     <span className="text-slate-400">এখনো খেলোনি</span>
                   )}
                 </div>
-                <span className="w-full py-2.5 rounded-xl font-black text-white clay-btn-purple text-base">খেলো এখনই 🚀</span>
+                <span className="w-full py-3 rounded-full font-black text-white text-lg clay-btn-orange">খেলো এখনই 🚀</span>
               </motion.button>
             );
           })}

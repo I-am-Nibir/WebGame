@@ -162,3 +162,19 @@ export const GAMES: GameMeta[] = [
 ];
 
 export const getGame = (id: string) => GAMES.find((g) => g.id === id);
+
+/** Little emoji "poster" shown on each home-page card (centre emoji first). */
+export const CARD_ART: Record<string, { art: [string, string, string]; panel: string }> = {
+  balloon: { art: ["🎈", "🎈", "⭐"], panel: "bg-violet-200" },
+  whack: { art: ["🐹", "🔨", "🌱"], panel: "bg-orange-200" },
+  xylophone: { art: ["🎹", "🎵", "🎶"], panel: "bg-emerald-200" },
+  catch: { art: ["🧁", "🍩", "🍬"], panel: "bg-pink-200" },
+  maze: { art: ["🔮", "⭐", "🌀"], panel: "bg-teal-200" },
+  space: { art: ["🚀", "🪐", "⭐"], panel: "bg-indigo-200" },
+  slice: { art: ["🍉", "🍓", "🍋"], panel: "bg-rose-200" },
+  memory: { art: ["🦁", "🐼", "🐸"], panel: "bg-purple-200" },
+  simon: { art: ["💡", "🔴", "🔵"], panel: "bg-yellow-200" },
+  math: { art: ["🔢", "➕", "➖"], panel: "bg-sky-200" },
+  tictactoe: { art: ["☀️", "🌙", "⭐"], panel: "bg-amber-200" },
+  doodle: { art: ["🎨", "🖌️", "🌈"], panel: "bg-fuchsia-200" },
+};
