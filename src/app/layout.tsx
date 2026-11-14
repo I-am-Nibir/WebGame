@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Maisha - Kids 3D Gaming Arcade",
-  description: "বাচ্চাদের জন্য ৩ডি গেমস, শেখা ও আনন্দের নিরাপদ প্ল্যাটফর্ম",
+  description: "বাচ্চাদের জন্য 3D গেমস, শেখা ও আনন্দের নিরাপদ প্ল্যাটফর্ম",
   applicationName: "Maisha Arcade",
 };
 
