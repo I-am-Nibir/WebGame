@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Ico, Rich } from "@/components/ui/Icons";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
 import { toBn } from "@/lib/format";
@@ -125,13 +126,13 @@ export default function SimonBeat() {
         <span aria-label={`${lives} জীবন`}>
           {[0, 1, 2].map((i) => (
             <span key={i} className={i < lives ? "" : "grayscale opacity-30"}>
-              ❤️
+              <Ico n="❤️" size={30} />
             </span>
           ))}
         </span>
       </div>
       <p className="text-yellow-300 font-black text-2xl min-h-8" aria-live="polite">
-        {status}
+        <Rich>{status}</Rich>
       </p>
       <div className="grid grid-cols-2 gap-4 w-full max-w-sm aspect-square">
         {PADS.map((p, i) => {

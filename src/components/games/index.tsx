@@ -2,10 +2,11 @@
 
 import dynamic from "next/dynamic";
 import type { ComponentType } from "react";
+import { Ico } from "@/components/ui/Icons";
 
 const Loading = () => (
-  <div className="h-full w-full grid place-items-center text-6xl animate-bounce" aria-label="লোড হচ্ছে">
-    🎮
+  <div className="h-full w-full grid place-items-center animate-bounce" aria-label="লোড হচ্ছে">
+    <Ico n="🎮" size={80} />
   </div>
 );
 

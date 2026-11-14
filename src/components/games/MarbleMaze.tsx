@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef } from "react";
+import { Rich } from "@/components/ui/Icons";
 import { useFrame, useThree } from "@react-three/fiber";
 import { RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
@@ -327,7 +328,7 @@ export default function MarbleMaze() {
         <Field />
       </Scene3D>
       <div className="absolute bottom-3 inset-x-0 text-center text-white/90 font-bold pointer-events-none text-sm">
-        👆 আঙুল টেনে বোর্ড হেলাও
+        <Rich>👆 আঙুল টেনে বোর্ড হেলাও</Rich>
       </div>
     </>
   );

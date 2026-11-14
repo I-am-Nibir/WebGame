@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Rich } from "@/components/ui/Icons";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import Scene3D from "@/components/3d/Scene3D";
@@ -248,7 +249,7 @@ export default function SweetsCatcher() {
         <Field />
       </Scene3D>
       <div className="absolute bottom-2 inset-x-0 text-center text-white/80 font-bold pointer-events-none text-sm">
-        👆 আঙুল বা মাউস সরাও
+        <Rich>👆 আঙুল বা মাউস সরাও</Rich>
       </div>
     </>
   );

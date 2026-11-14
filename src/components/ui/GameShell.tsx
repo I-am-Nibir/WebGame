@@ -3,6 +3,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
+import MaishaChar from "@/components/ui/MaishaChar";
+import { Ico, Rich } from "@/components/ui/Icons";
 import { ArrowLeft, Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import { COINS_BY_STARS, type GameMeta } from "@/lib/games";
 import { useGameStore } from "@/lib/store";
@@ -181,13 +183,13 @@ export default function GameShell({
             <ArrowLeft size={26} />
           </button>
           <div className="flex items-center gap-2 font-black text-lg min-w-0">
-            <span className="text-2xl">{meta.icon}</span>
+            <Ico n={meta.icon} size={34} />
             <span className="truncate">{meta.name}</span>
           </div>
           <div className="ml-auto flex items-center gap-2">
             {!meta.freePlay && (
               <div className="px-3 h-10 rounded-full bg-white/20 font-black flex items-center gap-1" aria-live="polite">
-                ⭐ {toBn(score)}
+                <Ico n="⭐" size="1.25em" /> {toBn(score)}
               </div>
             )}
             {!meta.freePlay && status === "playing" && (
@@ -215,22 +217,27 @@ export default function GameShell({
 
           {status === "ready" && (
             <Overlay>
-              <div className="text-7xl mb-2">{meta.icon}</div>
+              <div className="flex justify-center -mt-1 mb-1">
+                <MaishaChar mode="chill" height={130} sparkles={false} />
+              </div>
+              <div className="flex justify-center mb-1">
+                <Ico n={meta.icon} size={56} />
+              </div>
               <h2 className="text-2xl font-black text-purple-950 mb-2">{meta.name}</h2>
               <p className="text-slate-600 font-semibold mb-5 leading-relaxed">{meta.howTo}</p>
               <button onClick={begin} className="w-full py-4 rounded-2xl font-black text-2xl text-purple-950 clay-btn-yellow">
-                শুরু করো! 🚀
+                <Rich>শুরু করো! 🚀</Rich>
               </button>
             </Overlay>
           )}
 
           {status === "playing" && paused && (
             <Overlay>
-              <div className="text-6xl mb-2">⏸️</div>
+              <div className="flex justify-center mb-2"><Ico n="⏸️" size={64} /></div>
               <h2 className="text-2xl font-black text-purple-950 mb-5">বিরতি</h2>
               <div className="space-y-3">
                 <button onClick={() => setPaused(false)} className="w-full py-4 rounded-2xl font-black text-xl text-purple-950 clay-btn-yellow">
-                  চালিয়ে যাও ▶
+                  চালিয়ে যাও
                 </button>
                 <button onClick={onClose} className="w-full py-3 rounded-2xl font-black text-lg text-white clay-btn-purple">
                   বাইরে যাও
@@ -241,8 +248,11 @@ export default function GameShell({
 
           {status === "over" && result && (
             <Overlay>
+              <div className="flex justify-center -mt-1">
+                <MaishaChar mode={result.stars >= 1 ? "victory" : "chill"} height={140} sparkles={false} />
+              </div>
               <h2 className="text-2xl font-black text-purple-950 mb-1">
-                {result.stars === 3 ? "দারুণ! 🎉" : result.stars >= 1 ? "খুব ভালো! 👏" : "আবার চেষ্টা করো! 💪"}
+                <Rich>{result.stars === 3 ? "দারুণ! 🎉" : result.stars >= 1 ? "খুব ভালো! 👏" : "আবার চেষ্টা করো! 💪"}</Rich>
               </h2>
               <div className="flex justify-center gap-2 my-3" aria-label={`${result.stars} তারা`}>
                 {[0, 1, 2].map((i) => (
@@ -251,16 +261,16 @@ export default function GameShell({
                     initial={{ scale: 0, rotate: -90 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ delay: 0.15 * i, type: "spring", stiffness: 300 }}
-                    className={`text-6xl ${i < result.stars ? "" : "grayscale opacity-30"}`}
+                    className={i < result.stars ? "" : "grayscale opacity-30"}
                   >
-                    ⭐
+                    <Ico n="⭐" size={60} />
                   </motion.span>
                 ))}
               </div>
               <p className="text-xl font-black text-slate-800">স্কোর: {toBn(result.score)}</p>
-              <p className="text-amber-600 font-black text-lg">+{toBn(result.coins)} কয়েন ⭐</p>
+              <p className="text-amber-600 font-black text-lg flex items-center justify-center gap-1">+{toBn(result.coins)} কয়েন <Ico n="⭐" size="1.3em" /></p>
               <p className="text-slate-500 font-bold mb-5">
-                {result.newBest ? "🏆 নতুন রেকর্ড!" : `সেরা স্কোর: ${toBn(result.best)}`}
+                <Rich>{result.newBest ? "🏆 নতুন রেকর্ড!" : `সেরা স্কোর: ${toBn(result.best)}`}</Rich>
               </p>
               <div className="space-y-3">
                 <button onClick={begin} className="w-full py-4 rounded-2xl font-black text-xl text-purple-950 clay-btn-yellow flex items-center justify-center gap-2">

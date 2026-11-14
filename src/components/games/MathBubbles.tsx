@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Rich } from "@/components/ui/Icons";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
 import { toBn } from "@/lib/format";
@@ -92,7 +93,7 @@ export default function MathBubbles() {
         <div className="bg-white rounded-[2rem] px-8 py-5 shadow-xl border-4 border-sky-200">
           <p className="text-5xl sm:text-6xl font-black text-sky-700 tracking-wide">{q.text} = ?</p>
         </div>
-        <p className="mt-3 h-7 text-white font-black text-lg">{streak >= 3 ? `🔥 ধারাবাহিক ${toBn(streak)}!` : ""}</p>
+        <p className="mt-3 h-7 text-white font-black text-lg">{streak >= 3 ? <Rich>{`🔥 ধারাবাহিক ${toBn(streak)}!`}</Rich> : ""}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-5 w-full max-w-sm">

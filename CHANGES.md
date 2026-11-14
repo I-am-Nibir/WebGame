@@ -164,3 +164,52 @@ src/
 - গেম কার্ড: মোটা বেগুনি বর্ডার, রঙিন ছবির প্যানেল, কমলা "খেলো এখনই" বোতাম
 - ক্রিম ব্যাকগ্রাউন্ডে হালকা কনফেটি ডট
 - "খেলা শুরু করো" বোতাম গেম তালিকায় স্মুথ স্ক্রল করে
+
+---
+
+## ৮. প্রিভিউ ও ডিপ্লয় নোট
+
+- প্রিভিউয়ের জন্য সাইটটি স্ট্যাটিক এক্সপোর্ট (`output: "export"`) করে আলাদা কপিতে বিল্ড করা হয়েছিল। আসল প্রজেক্টের `next.config.mjs` বদলানো হয়নি।
+- প্রিভিউয়ে `_next` ফোল্ডারের নাম `nx` করতে হয়েছিল, কারণ প্রিভিউ হোস্ট `_` দিয়ে শুরু হওয়া নাম নেয় না। নিজের হোস্টিংয়ে এটা লাগবে না।
+- প্রিভিউয়ে ডাউনলোড (ডুডল সেভ) বন্ধ, আর কয়েন/স্কোর সেভ ভিউয়ারের ব্রাউজার ব্লক করলে চলবে না।
+- হেডলেস Chrome-এ ১২টা গেম খুলে কনসোল এরর নেই দেখা হয়েছে। আসল ফোনে টাচ ও পারফরম্যান্স এখনো টেস্ট হয়নি।
+
+### Render-এ ডিপ্লয়
+| সেটিং | মান |
+|---|---|
+| ধরন | Web Service (Runtime: Node) |
+| Build Command | `npm install && npm run build` |
+| Start Command | `npm start` |
+| Environment | `NODE_VERSION` = `20` |
+
+- ফ্রি প্ল্যানে কিছুক্ষণ কেউ না এলে সাইট ঘুমিয়ে যায়, আবার খুললে প্রথম লোডে প্রায় ৫০ সেকেন্ড লাগতে পারে।
+- ফ্রি প্ল্যানে মেমরি কম (৫১২ MB)। বিল্ডে "out of memory" এলে Environment-এ `NODE_OPTIONS` = `--max-old-space-size=460` দিন।
+- Render-এ আমি ডিপ্লয় করে দেখিনি, এটা সাধারণ Node সেটআপ অনুযায়ী।
+
+---
+
+## 9. Maisha character, Abir monsters, 3D cartoon icons (latest)
+
+**Maisha character (animated)**
+- Uses the character-design art you made (4 poses cut out to transparent WebP in `public/maisha/`: `stand`, `wave`, `explore`, `victory`).
+- `src/components/ui/MaishaChar.tsx` — one component, 3 modes:
+  - `chill` – breathing + gentle sway, waves hello every few seconds (stand ↔ wave frames), twinkling icons around her
+  - `victory` – jumping with arms up + falling confetti icons
+  - `explore` – walking bob (backpack + map)
+- Home page hero: `MaishaMascot.tsx` (tap her → she hops, giggles, speech bubble, +5 coin bonus every 45 s). It replaces the old 3D bunny, so `MascotCanvas.tsx` was deleted.
+- Game start screen: Maisha chills/waves. Game result screen: Maisha does the victory jump when you get ≥ 1 star.
+- Nav logo + favicon (`icon.svg`): small vector cartoon Maisha face (`MaishaFace.tsx`).
+
+**Monster Tap (Whack-a-Monster)**
+- Monsters now have Abir kaku's face wrapped on their head (`public/photos/abir-face.webp`, 400 px, soft edges), horns, ears; they wobble, go red + dizzy stars when bonked, and stay up for a moment before sinking.
+- One monster per hole instead of five hidden variants (lighter for phones).
+
+**All emoji replaced by 3D cartoon icons**
+- `src/components/ui/Icons.tsx`: 55 hand-built SVG icons (clay shading + outline): stars, hearts, rocket, balloon, animals, fruits, rainbow, trophy, etc.
+- `<Ico n="⭐" />` renders an icon by emoji or name; `<Rich>text 🎉</Rich>` swaps emoji inside strings.
+- Canvas games (Fruit Slice, Glow Doodle) draw the same icons via `src/lib/iconImage.ts`.
+- Emoji characters are still used internally as keys (saved avatar, game ids) but are never shown.
+
+**Privacy note:** anything in `public/` is public once the site is online. `public/photos/abir-face.webp` is Abir's photo crop — remove/replace it if you don't want that public. Maisha's own photos are NOT in the project (only the cartoon art).
+
+**To add a new icon:** add an entry to `DRAW` and `EMOJI_MAP` in `Icons.tsx`.

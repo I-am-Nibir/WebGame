@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { Ico } from "@/components/ui/Icons";
 
 /** Inline CSS variables (animation duration / delay) without fighting TypeScript. */
 const vars = (o: Record<string, string | number>) => o as React.CSSProperties;
@@ -131,7 +132,7 @@ export default function HeroBanner({ children }: { children: React.ReactNode }) 
         {/* flying unicorn with sparkle trail (moves left to right) */}
         <div className="absolute left-0 top-[62%] sm:top-[18%] w-full hero-drift" style={vars({ "--d": "42s", "--delay": "-14s" })}>
           <div className="absolute right-0 hero-bob text-4xl sm:text-5xl" style={vars({ "--d": "3s" })}>
-            ✨🦄
+            <Ico n="✨" size="0.8em" /><Ico n="🦄" size="1em" />
           </div>
         </div>
 
@@ -146,25 +147,25 @@ export default function HeroBanner({ children }: { children: React.ReactNode }) 
               className="absolute bottom-0 text-4xl hero-sway"
               style={{ filter: `hue-rotate(${b.hue}deg)`, ...vars({ "--delay": `${b.l}s` }) }}
             >
-              🎈
+              <Ico n="🎈" size="1em" />
             </span>
           </div>
         ))}
 
         {/* rocket flying up and to the right */}
         <div className="absolute inset-0 hero-rocket hidden sm:block" style={vars({ "--d": "17s", "--delay": "-6s" })}>
-          <span className="absolute left-[40%] bottom-0 text-4xl opacity-90">🚀</span>
+          <span className="absolute left-[40%] bottom-0 text-4xl opacity-90"><Ico n="🚀" size="1em" /></span>
         </div>
 
         {/* butterflies */}
         <span className="absolute left-[44%] top-[62%] text-3xl hero-flutter hidden sm:block" style={vars({ "--d": "9s" })}>
-          🦋
+          <Ico n="🦋" size="1em" />
         </span>
         <span
           className="absolute left-[52%] top-[30%] text-2xl hero-flutter hidden md:block"
           style={vars({ "--d": "11s", "--delay": "-4s" })}
         >
-          🦋
+          <Ico n="🦋" size="1em" />
         </span>
 
         {/* rolling hills */}
@@ -179,7 +180,7 @@ export default function HeroBanner({ children }: { children: React.ReactNode }) 
 
         {/* galloping horse along the hill (runs right to left) */}
         <div className="absolute left-0 bottom-[6%] w-full hero-gallop" style={vars({ "--d": "24s", "--delay": "-8s" })}>
-          <div className="absolute left-0 bottom-0 hero-hop text-5xl md:text-6xl">🐎</div>
+          <div className="absolute left-0 bottom-0 hero-hop text-5xl md:text-6xl"><Ico n="🐰" size="1em" /></div>
         </div>
       </div>
 

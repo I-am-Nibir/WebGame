@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import { drawIcon, getIconImage } from "@/lib/iconImage";
+import { Ico } from "@/components/ui/Icons";
 import { Download, Eraser, Trash2, Undo2 } from "lucide-react";
 import { sounds } from "@/lib/audioEngine";
 
@@ -21,7 +23,7 @@ const BG = "#0b0724";
 const COLORS = ["#22d3ee", "#a78bfa", "#f472b6", "#facc15", "#4ade80", "#fb923c", "#ffffff", "#f87171"];
 const SIZES = [6, 12, 22];
 const STAMPS = ["⭐", "❤️", "🌈", "🦄", "🌸"];
-const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+if (typeof window !== "undefined") STAMPS.forEach((e) => getIconImage(e));
 
 function drawSegment(ctx: CanvasRenderingContext2D, s: Stroke, a: Pt, b: Pt, idx: number) {
   const color = s.eraser ? BG : s.rainbow ? `hsl(${(idx * 14) % 360} 95% 62%)` : s.color;
@@ -40,12 +42,9 @@ function drawStroke(ctx: CanvasRenderingContext2D, s: Stroke) {
   ctx.lineCap = "round";
   ctx.lineJoin = "round";
   if (s.stamp) {
-    ctx.font = `${s.size * 4}px ${EMOJI_FONT}`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
     ctx.shadowColor = "rgba(255,255,255,.5)";
     ctx.shadowBlur = 18;
-    ctx.fillText(s.stamp, s.points[0].x, s.points[0].y);
+    drawIcon(ctx, s.stamp, s.points[0].x, s.points[0].y, s.size * 4.4);
   } else if (s.points.length === 1) {
     const p = s.points[0];
     drawSegment(ctx, s, p, { x: p.x + 0.01, y: p.y }, 0);
@@ -228,10 +227,10 @@ export default function GlowDoodle() {
                 setStamp(stamp === s ? null : s);
                 setEraser(false);
               }}
-              aria-label={`স্ট্যাম্প ${s}`}
+              aria-label="স্ট্যাম্প"
               className={toolBtn(stamp === s)}
             >
-              {s}
+              <Ico n={s} size={28} />
             </button>
           ))}
           <span className="w-px h-8 bg-white/30 shrink-0" />

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Ico } from "@/components/ui/Icons";
 import { useFrame } from "@react-three/fiber";
 import { Stars } from "@react-three/drei";
 import * as THREE from "three";
@@ -250,7 +251,7 @@ export default function SpaceRun() {
       <div className="absolute left-3 top-3 flex gap-1 text-3xl pointer-events-none" aria-label={`${lives} জীবন`}>
         {[0, 1, 2].map((i) => (
           <span key={i} className={i < lives ? "" : "grayscale opacity-30"}>
-            ❤️
+            <Ico n="❤️" size={34} />
           </span>
         ))}
       </div>

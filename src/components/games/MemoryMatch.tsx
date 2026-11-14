@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Ico, iconName } from "@/components/ui/Icons";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
 import { toBn } from "@/lib/format";
@@ -81,7 +82,7 @@ export default function MemoryMatch() {
             <button
               key={card.id}
               onClick={() => flip(card.id)}
-              aria-label={open ? card.emoji : "বন্ধ কার্ড"}
+              aria-label={open ? iconName(card.emoji) ?? "কার্ড" : "বন্ধ কার্ড"}
               className="aspect-square [perspective:700px]"
             >
               <div
@@ -90,14 +91,14 @@ export default function MemoryMatch() {
                 }`}
               >
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-fuchsia-500 to-purple-700 border-4 border-white/80 shadow-[0_6px_0_#581c87] flex items-center justify-center text-4xl text-white [backface-visibility:hidden]">
-                  ⭐
+                  <Ico n="⭐" size={44} />
                 </div>
                 <div
                   className={`absolute inset-0 rounded-2xl border-4 flex items-center justify-center text-5xl [backface-visibility:hidden] [transform:rotateY(180deg)] ${
                     done ? "bg-emerald-100 border-emerald-400 shadow-[0_6px_0_#059669]" : "bg-white border-yellow-300 shadow-[0_6px_0_#ca8a04]"
                   }`}
                 >
-                  {card.emoji}
+                  <Ico n={card.emoji} size={60} />
                 </div>
               </div>
             </button>

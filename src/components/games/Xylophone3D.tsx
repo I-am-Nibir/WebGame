@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Rich } from "@/components/ui/Icons";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Html, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
@@ -168,7 +169,7 @@ export default function Xylophone3D() {
           }}
           className="pointer-events-auto px-6 py-3 rounded-2xl font-black text-lg text-purple-950 clay-btn-yellow"
         >
-          🌟 তারার গান শেখো: {hintOn ? "চালু" : "বন্ধ"}
+          <Rich>{`🌟 তারার গান শেখো: ${hintOn ? "চালু" : "বন্ধ"}`}</Rich>
         </button>
       </div>
     </div>

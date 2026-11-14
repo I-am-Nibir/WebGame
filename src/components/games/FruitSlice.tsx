@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { drawIcon, getIconImage } from "@/lib/iconImage";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
 import { toBn } from "@/lib/format";
@@ -102,6 +103,7 @@ export default function FruitSlice() {
     let raf = 0;
     let prev = performance.now();
 
+    FRUITS.forEach(([e]) => getIconImage(e));
     const size = () => Math.max(44, Math.min(72, H * 0.13));
 
     const spawn = () => {
@@ -247,7 +249,7 @@ export default function FruitSlice() {
         ctx.save();
         ctx.translate(it.x, it.y);
         ctx.rotate(it.rot);
-        ctx.fillText(it.emoji, 0, 0);
+        drawIcon(ctx, it.emoji, 0, 0, sz * 1.1);
         ctx.restore();
       }
       for (const h of halves) {
@@ -258,7 +260,7 @@ export default function FruitSlice() {
         ctx.beginPath();
         ctx.rect(h.side < 0 ? -sz : 0, -sz, sz, sz * 2);
         ctx.clip();
-        ctx.fillText(h.emoji, 0, 0);
+        drawIcon(ctx, h.emoji, 0, 0, sz * 1.1);
         ctx.restore();
       }
       ctx.globalAlpha = 1;

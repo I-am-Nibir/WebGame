@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { Ico, Rich } from "@/components/ui/Icons";
 import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
 
@@ -110,7 +111,7 @@ export default function SunVsMoon() {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 p-4">
       <p className="font-black text-2xl text-amber-950 bg-white/60 px-6 py-2 rounded-full" aria-live="polite">
-        {status}
+        <Rich>{status}</Rich>
       </p>
       <div className="w-full max-w-sm" style={{ transform: "perspective(800px) rotateX(18deg)" }}>
         <div className="grid grid-cols-3 gap-3 p-3 rounded-[2rem] bg-orange-600/80 shadow-[0_14px_0_#9a3412]">
@@ -125,8 +126,8 @@ export default function SunVsMoon() {
                   win ? "bg-yellow-200 shadow-[0_6px_0_#ca8a04] animate-bob" : "bg-amber-50 shadow-[0_6px_0_#d6b98a]"
                 }`}
               >
-                {c === "S" && <span className="animate-pop">☀️</span>}
-                {c === "M" && <span className="animate-pop">🌙</span>}
+                {c === "S" && <span className="animate-pop"><Ico n="☀️" size={64} /></span>}
+                {c === "M" && <span className="animate-pop"><Ico n="🌙" size={64} /></span>}
               </button>
             );
           })}
