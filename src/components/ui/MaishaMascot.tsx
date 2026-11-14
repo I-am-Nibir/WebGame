@@ -17,14 +17,14 @@ const MESSAGES: Msg[] = [
   { icon: "👋", bn: "হাই! আমি মাইশা!", en: "Hi! I'm Maisha!", tone: "from-pink-400 to-rose-500" },
   { icon: "🎮", bn: "চলো, একসাথে খেলি!", en: "Let's play together!", tone: "from-violet-400 to-purple-600" },
   { icon: "🤭", bn: "হি হি, সুড়সুড়ি লাগছে!", en: "Hehe, that tickles!", tone: "from-amber-300 to-orange-500" },
-  { icon: "💖", bn: "উফ্‌, তুমি কত মিষ্টি!", en: "Aww, you're so sweet!", tone: "from-pink-400 to-fuchsia-500" },
+  { icon: "💖", bn: "তুমি কত মিষ্টি!", en: "Aww, you're so sweet!", tone: "from-pink-400 to-fuchsia-500" },
   { icon: "🏆", bn: "তুমিই আজকের চ্যাম্পিয়ন!", en: "You're today's champion!", tone: "from-yellow-300 to-amber-500" },
   { icon: "🚀", bn: "রকেট রান খেলে দেখো!", en: "Try Rocket Run!", tone: "from-sky-400 to-indigo-500" },
   { icon: "🎈", bn: "বেলুনগুলো ফাটিয়ে দাও!", en: "Pop all the balloons!", tone: "from-rose-400 to-red-500" },
   { icon: "🦄", bn: "জানো? ইউনিকর্ন আমার বন্ধু!", en: "Unicorns are my friends!", tone: "from-fuchsia-400 to-purple-500" },
   { icon: "🌈", bn: "আজকের দিনটা রংধনুর মতো!", en: "Today is rainbow-bright!", tone: "from-cyan-400 to-emerald-500" },
   { icon: "🎨", bn: "চলো, রঙিন ছবি আঁকি!", en: "Let's draw something!", tone: "from-orange-400 to-pink-500" },
-  { icon: "💪", bn: "তুমি অনেক স্মার্ট আর শক্তিশালী!", en: "You're smart and strong!", tone: "from-emerald-400 to-teal-600" },
+  { icon: "💪", bn: "তুমি অনেক স্মার্ট!", en: "You're smart and strong!", tone: "from-emerald-400 to-teal-600" },
   { icon: "🎵", bn: "সুর বাজিয়ে গান গাই!", en: "Let's play a song!", tone: "from-indigo-400 to-violet-600" },
 ];
 
