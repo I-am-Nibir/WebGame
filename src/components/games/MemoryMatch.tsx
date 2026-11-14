@@ -7,6 +7,7 @@ import { useGame } from "@/components/ui/GameShell";
 import { sounds } from "@/lib/audioEngine";
 import { toBn } from "@/lib/format";
 
+const PREVIEW_SECONDS = 10;
 const ANIMALS = ["🐶", "🐱", "🐼", "🦁", "🐸", "🦄"];
 
 function shuffled() {
@@ -21,12 +22,15 @@ function shuffled() {
 
 export default function MemoryMatch() {
   const t = useT();
-  const { active, addScore, finish } = useGame();
+  const { active, status, addScore, finish } = useGame();
   const deck = useMemo(shuffled, []);
   const [flipped, setFlipped] = useState<number[]>([]);
   const [matched, setMatched] = useState<string[]>([]);
   const [moves, setMoves] = useState(0);
   const lock = useRef(false);
+  const [previewLeft, setPreviewLeft] = useState(PREVIEW_SECONDS);
+  const previewDone = previewLeft <= 0;
+  const previewing = status === "playing" && previewLeft > 0;
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   useEffect(() => {
@@ -34,8 +38,15 @@ export default function MemoryMatch() {
     return () => t.forEach(clearTimeout);
   }, []);
 
+  // Show every card for 10 seconds at the start. Ticks only while active, so pausing also pauses the preview.
+  useEffect(() => {
+    if (!active || previewDone) return;
+    const iv = setInterval(() => setPreviewLeft((n) => Math.max(0, n - 1)), 1000);
+    return () => clearInterval(iv);
+  }, [active, previewDone]);
+
   const flip = (id: number) => {
-    if (!active || lock.current || flipped.includes(id)) return;
+    if (previewing || !active || lock.current || flipped.includes(id)) return;
     const card = deck[id];
     if (matched.includes(card.emoji)) return;
     sounds.pop(1.2);
@@ -75,10 +86,19 @@ export default function MemoryMatch() {
 
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center p-4 gap-4">
-      <div className="font-black text-white text-xl bg-black/20 px-5 py-2 rounded-full">{t("চাল", "Moves")}: {toBn(moves)}</div>
+      {previewing ? (
+        <button
+          onClick={() => setPreviewLeft(0)}
+          className="font-black text-white text-xl bg-orange-500 border-4 border-white/80 px-5 py-2 rounded-full shadow-[0_5px_0_#9a3412] active:translate-y-1"
+        >
+          {t("মনে রাখো!", "Remember them!")} {toBn(previewLeft)} · {t("রেডি", "Ready")}
+        </button>
+      ) : (
+        <div className="font-black text-white text-xl bg-black/20 px-5 py-2 rounded-full">{t("চাল", "Moves")}: {toBn(moves)}</div>
+      )}
       <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 w-full max-w-md">
         {deck.map((card) => {
-          const open = flipped.includes(card.id) || matched.includes(card.emoji);
+          const open = previewing || flipped.includes(card.id) || matched.includes(card.emoji);
           const done = matched.includes(card.emoji);
           return (
             <button
